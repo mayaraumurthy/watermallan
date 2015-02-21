@@ -13,19 +13,26 @@ typedef struct data
 	float mmPerBlock;
 } data;
 
+void initProbArray(data* D){
+	int i;
+	for ( i=0;i<D->size;i++){
+		D->probs[i]=1.0;
+	}
+}
+
 void shiftProbs(data* D, bool shiftLeft){
 	//copy probabilities to another array
 	int i;
 
 	if (shiftLeft){
 		float firstProb=D->probs[0];
-		for(i=0;i<((D->size));i++){
+		for(i=0;i<((D->size)-1);i++){
 			D->probs[i]=D->probs[i+1];
 		}
 		D->probs[(D->size)-1]=firstProb;
 	}else{ //shift right
 		float lastProb=D->probs[(D->size)-1];
-		for(i=((D->size)-1);i>=0;i--){
+		for(i=((D->size)-1);i>0;i--){
 			D->probs[i]=D->probs[i-1];
 		}
 		D->probs[0]=lastProb;
@@ -69,9 +76,14 @@ int foundLocation(data*D){
 	}
 	if (totalOnes==1){
 		return oneLoc;
-	}else{
-		return -1;
 	}
+	if(totalOnes==0){
+		initProbArray(D);
+		playSound(soundUpwardTones);
+
+	}
+	return -1;
+
 }
 
 void updateSensorReadings(data* D, bool sensedObstacle){
@@ -90,7 +102,7 @@ void updateSensorReadings(data* D, bool sensedObstacle){
 
 //Detect the things.
 bool hasObstacle(){
-	if(SensorValue[sonarSensor] >= 20){
+	if(SensorValue[sonarSensor] <= 20){
 		playSound(soundBeepBeep);
 		return true;
 	}
@@ -105,39 +117,63 @@ void makeUpdates(data* D){
 }
 
 //float x,float y, float prevUpdateX, float prevUpdateY
-bool shouldMakeUpdate(data* D,int prevUpdateX,int prevUpdateY){
+bool shouldMakeUpdate(data* D,float* prevUpdateX,float* prevUpdateY){
 	//within a certain interval of where we want to s
 	//we haven't sampled within that interval already
+
+	int oldX=(int)(*prevUpdateX);
+	int oldY=(int)(*prevUpdateY);
 	int x=(int)robot_X;
 	int y=(int)robot_Y;
 	int mmPerBlock=(int)D->mmPerBlock;
-	float minInterval=10.0;
-	if ((( (int)x%(mmPerBlock)) < minInterval) ||((y%(mmPerBlock)) < minInterval)){
-		if ((abs(x-prevUpdateX)>(mmPerBlock)) || (abs(y-prevUpdateY)>(mmPerBlock))){
-			return true;
-		}else{
- 			return false;
-		}
+
+	if (((abs(x-oldX))>mmPerBlock) || ((abs(y-oldY))>mmPerBlock)){
+		(*prevUpdateX)=robot_X;
+		(*prevUpdateY)=robot_Y;
+		//playSound(soundBeepBeep);
+		return true;
 	}else{
 		return false;
 	}
 }
 
 
-task main()
+void initializeStruct(data* D){
+
+		D->size = 10;
+		D->mmPerBlock = 145.4;
+
+		D->obstacles[0] = 0;
+		D->obstacles[1] = 0;
+		D->obstacles[2] = 1;
+		D->obstacles[3] = 1;
+		D->obstacles[4] = 1;
+		D->obstacles[5] = 0;
+		D->obstacles[6] = 1;
+		D->obstacles[7] = 1;
+		D->obstacles[8] = 0;
+		D->obstacles[9] = 0;
+		initProbArray(D);
+}
+
+task local_main()
 {
-	int prevUpdateX=0;
-	int prevUpdateY=0;
+	float prevUpdateX=0;
+	float prevUpdateY=0;
 	data D;
+	initializeStruct(&D);
 	makeUpdates(&D);
 	startTask(dead_reckoning);
-	while(!foundLocation(&D)){
-		if(shouldMakeUpdate(&D, prevUpdateX, prevUpdateY)){
+	playSound(soundShortBlip);
+
+
+	while(foundLocation(&D) == -1){
+		if(shouldMakeUpdate(&D, &prevUpdateX, &prevUpdateY)){
 			makeUpdates(&D);
-			prevUpdateX = robot_X;
-			prevUpdateY = robot_Y;
+
 		}
 	}
+	playSound(soundDownwardTones);
 
 
  // team WAtermallan is the best at everything in das haus.
