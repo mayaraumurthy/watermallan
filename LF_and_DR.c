@@ -26,7 +26,7 @@ task main()
 	int blackTime = 0;
 	startTask(local_main);
 	int currSensorVal;
-	while(true){
+	while(!stop_lf){
 		displayTextLine(6, "X: %f", sensorValue[sonarSensor]);
 		currSensorVal=SensorValue[lightSensor];
 		if ((desiredMin <= currSensorVal) && ( currSensorVal <= desiredMax)) {
@@ -67,12 +67,16 @@ task main()
 	  	  powerL=turnPower-turn;
 	    }
 	  }
-	  displayTextLine(4, " %d  ", blackTime);
 		motor[motorLeft]=powerL;
 		motor[motorRight]=powerR;
 		prevError=error;
 		oldSensorVal=currSensorVal;
 
 	}
+	  displayTextLine(5, "loc %d  ", end_loc);
+			motor[motorLeft]=0;
+		motor[motorRight]=0;
+		nNxtButtonTask  = 0;
+	while(nNxtButtonPressed != kExitButton) {;}
 
 }
