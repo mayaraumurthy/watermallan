@@ -118,11 +118,11 @@ task dead_reckoning()
 
 		//Code that plots the robot's current position and also prints it out as text
 		//writeDebugStream("%f\n", robot_X);
-		setPixel(50 + (int)(100.0 * robot_X), 32 + (int)(100.0 * robot_Y));
+		/*setPixel(50 + (int)(100.0 * robot_X), 32 + (int)(100.0 * robot_Y));
 		displayTextLine(0, "X: %f", robot_X);
 		displayTextLine(1, "Y: %f", robot_Y);
 		displayTextLine(2, "t: %f", (57.2958 * robot_TH) % 360);
-	  displayTextLine(3, "r: %f", r);
+	  displayTextLine(3, "r: %f", r);*/
 
 		wait1Msec(velocityUpdateInterval);
 	}
@@ -214,11 +214,11 @@ task dr_main()
 	  accumR = 0;
   }
 
-  	setPixel(50 + (int)(100.0 * robot_X), 32 + (int)(100.0 * robot_Y));
+  	/*setPixel(50 + (int)(100.0 * robot_X), 32 + (int)(100.0 * robot_Y));
 		displayTextLine(0, "X: %f", robot_X);
 		displayTextLine(1, "Y: %f", robot_Y);
 		displayTextLine(2, "t: %f", (float)((57.2958 * robot_TH) % 360));
-	  displayTextLine(3, "r: %f", r);
+	  displayTextLine(3, "r: %f", r);*/
 
   motor[motorRight] = 0;
 	motor[motorLeft] = 0;

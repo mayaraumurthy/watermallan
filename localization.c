@@ -105,7 +105,7 @@ void updateSensorReadings(data* D, bool sensedObstacle){
 
 //Detect the things.
 bool hasObstacle(){
-	if(SensorValue[sonarSensor] <= 20){
+	if(SensorValue[sonarSensor] <= 35){
 		playSound(soundBeepBeep);
 		return true;
 	}
@@ -149,7 +149,7 @@ void initializeStruct(data* D){
 		D->obstacles[0] = 0;
 		D->obstacles[1] = 0;
 		D->obstacles[2] = 0;
-		D->obstacles[3] = 1;
+		D->obstacles[3]= 1;
 		D->obstacles[4] = 1;
 		D->obstacles[5] = 1;
 		D->obstacles[6] = 1;
@@ -168,20 +168,26 @@ task local_main()
 	makeUpdates(&D);
 	startTask(dead_reckoning);
 
-
 	end_loc = foundLocation(&D);
+	displayTextLine(0, "%d %d %d %d %d", (int)D.probs[0], (int)D.probs[1], (int)D.probs[2], (int)D.probs[3], (int)D.probs[4]);
+	displayTextLine(1, "%d %d %d %d %d", (int)D.probs[5], (int)D.probs[6], (int)D.probs[7], (int)D.probs[8], (int)D.probs[9]);
 	while(end_loc == -1){
 		//playSound(soundShortBlip);
 		if(shouldMakeUpdate(&D, &prevUpdateX, &prevUpdateY)){
 			makeUpdates(&D);
+		displayTextLine(0, "%d %d %d %d %d", (int)D.probs[0], (int)D.probs[1], (int)D.probs[2], (int)D.probs[3], (int)D.probs[4]);
+		displayTextLine(1, "%d %d %d %d %d", (int)D.probs[5], (int)D.probs[6], (int)D.probs[7], (int)D.probs[8], (int)D.probs[9]);
 		}
 		end_loc = foundLocation(&D);
 	}
 	stop_lf = true;
 	playSound(soundDownwardTones);
+
+		displayTextLine(0, "%d %d %d %d %d", (int)D.probs[0], (int)D.probs[1], (int)D.probs[2], (int)D.probs[3], (int)D.probs[4]);
+		displayTextLine(1, "%d %d %d %d %d", (int)D.probs[5], (int)D.probs[6], (int)D.probs[7], (int)D.probs[8], (int)D.probs[9]);
+
 	while(true){
 		int x = 1;
 	}
-
  // team WAtermallan is the best at everything in das haus.
 }

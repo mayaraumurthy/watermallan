@@ -73,8 +73,8 @@ task main()
 		oldSensorVal=currSensorVal;
 
 	}
-	  displayTextLine(5, "loc %d  ", end_loc);
-			motor[motorLeft]=0;
+	 //displayTextLine(5, "loc %d  ", end_loc);
+	  motor[motorLeft]=0;
 		motor[motorRight]=0;
 		nNxtButtonTask  = 0;
 	while(nNxtButtonPressed != kExitButton) {;}
