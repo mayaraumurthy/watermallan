@@ -8,8 +8,6 @@
 #include "helpers.c"
 
 bool goToGoal = false;
-bool stop_lf = false;
-
 
 task main()
 {
@@ -17,8 +15,8 @@ task main()
 	int desiredMin=44;
 	int desiredMax=60;
 	int prevError=0;
-	int defaultPower = 15;
-	int turnPower = 15;
+	int defaultPower = 5;
+	int turnPower = 5;
 	int powerL;
 	int powerR;
 	int error;
@@ -26,7 +24,7 @@ task main()
 	int whiteCounter;
 	int turnTime = 25;  //in miliseconds
 	int blackThreshold = 150;
-	float k= 6;
+	float k= 3;
 
 	float relGoalPos[2];
 
@@ -34,7 +32,7 @@ task main()
 	startTask(local_main);
 	int currSensorVal;
 	while(!stop_lf){
-		displayTextLine(6, "X: %f", sensorValue[sonarSensor]);
+		displayTextLine(6, "X: %f", SensorValue[sonarSensor]);
 		currSensorVal=SensorValue[lightSensor];
 		if ((desiredMin <= currSensorVal) && ( currSensorVal <= desiredMax)) {
 		  error = 0;
@@ -46,7 +44,7 @@ task main()
 	    error = currSensorVal - desiredMax;
 	    blackTime = 0;
 	  }
-		turn=(int)(k*((float)error))
+		turn=(int)(k*((float)error));
 		if (blackTime > blackThreshold) {
 			powerR = -50;
 			powerL = 10;
@@ -79,17 +77,6 @@ task main()
 		prevError=error;
 		oldSensorVal=currSensorVal;
 
-		if(localized && !goToGoal){
-			figureGoal (relGoalPos, robot_X, robot_Y, end_loc, 4);
-			goToGoal = true;
-		}
-
-		if(abs(relGoalPos[0] - robot_X) < 10 && goToGoal){
-			if(abs(relGoalPos[1] - robot_Y) < 10){
-				stop_lf = true;
-				playSound(soundLowBuzz)
-			}
-		}
 	}
 	 //displayTextLine(5, "loc %d  ", end_loc);
 	  motor[motorLeft]=0;

@@ -2,11 +2,11 @@
 
 //interpret inputs to the obstacles array
 void convertInput(int obs, data* d) {
-  int i;
-  for (i = 0; i < 10; i++) {
-  	d->obstacles[i] = obs & 1;
-  	obs = obs >> 1;
-  }
+	int i;
+	for (i = 0; i < 10; i++) {
+		d->obstacles[i] = obs & 1;
+		obs = obs >> 1;
+	}
 }
 
 //convert inch to mm
@@ -14,56 +14,58 @@ float inToMm(float in) {
 	return in * 25.4;
 }
 
+
+
 float blocksToMM(int block){
-	return inToMM(block*6);
+	return inToMm(block*6);
 }
 
 //figure out relative positions to the bottom left corner facing away from the windows
 void figurePos(float* pos, int indx) {
 	switch (indx) {
-		case 0:
-		  pos[0] = blocksToMM(0);
-		  pos[1] = blocksToMM(1);
-		  break;
-		case 1;
-		  pos[0] = blocksToMM(0);
-		  pos[1] = blocksToMM(2);
-		  break;
-	  case 2;
-	    pos[0] = blocksToMM(0);
-		  pos[1] = blocksToMM(3);
-		  break;
-		case 3;
-	  	pos[0] = blocksToMM(-1);
-		  pos[1] = blocksToMM(3);
-		  break;
-		case 4;
-		  pos[0] = blocksToMM(-2);
-		  pos[1] = blocksToMM(3);
-		  break;
-		case 5;
-	  	pos[0] = blocksToMM(-2);
-		  pos[1] = blocksToMM(2);
-		  break;
-		case 6;
-		  pos[0] = blocksToMM(-2);
-		  pos[1] = blocksToMM(1);
-		  break;
-		case 7;
-		  pos[0] = blocksToMM(-2);
-		  pos[1] = blocksToMM(-0);
-		  break;
-		case 8;
-		  pos[0] = blocksToMM(-1);
-		  pos[1] = blocksToMM(-1);
-		  break;
-		case 9;
-		  pos[0] = blocksToMM(0);
-		  pos[1] = blocksToMM(0);
-		  break;
-		default:
-		  pos[0] = blocksToMM(-1.0);
-		  pos[1] = blocksToMM(-1.0);
+	case 0:
+		pos[0] = blocksToMM(0);
+		pos[1] = blocksToMM(1);
+		break;
+	case 1:
+		pos[0] = blocksToMM(0);
+		pos[1] = blocksToMM(2);
+		break;
+	case 2:
+		pos[0] = blocksToMM(0);
+		pos[1] = blocksToMM(3);
+		break;
+	case 3:
+		pos[0] = blocksToMM(-1);
+		pos[1] = blocksToMM(3);
+		break;
+	case 4:
+		pos[0] = blocksToMM(-2);
+		pos[1] = blocksToMM(3);
+		break;
+	case 5:
+		pos[0] = blocksToMM(-2);
+		pos[1] = blocksToMM(2);
+		break;
+	case 6:
+		pos[0] = blocksToMM(-2);
+		pos[1] = blocksToMM(1);
+		break;
+	case 7:
+		pos[0] = blocksToMM(-2);
+		pos[1] = blocksToMM(-0);
+		break;
+	case 8:
+		pos[0] = blocksToMM(-1);
+		pos[1] = blocksToMM(-1);
+		break;
+	case 9:
+		pos[0] = blocksToMM(0);
+		pos[1] = blocksToMM(0);
+		break;
+	default:
+		pos[0] = blocksToMM(-1.0);
+		pos[1] = blocksToMM(-1.0);
 	}
 	return;
 }
