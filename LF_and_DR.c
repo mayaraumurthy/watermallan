@@ -15,8 +15,8 @@ task main()
 	int desiredMin=44;
 	int desiredMax=60;
 	int prevError=0;
-	int defaultPower = 5;
-	int turnPower = 5;
+	int defaultPower = 10;
+	int turnPower = 10;
 	int powerL;
 	int powerR;
 	int error;
@@ -24,7 +24,7 @@ task main()
 	int whiteCounter;
 	int turnTime = 25;  //in miliseconds
 	int blackThreshold = 150;
-	float k= 3;
+	float k= 4.5;
 
 	float relGoalPos[2];
 
@@ -83,8 +83,8 @@ task main()
 		motor[motorRight]=0;
 		nNxtButtonTask  = 0;
 
-	displayTextLine(2, "%d %f %f", end_loc, robot_X, relGoalPos[0]);
-	displayTextLine(3, "%d %f %f", end_loc, robot_Y, relGoalPos[1]);
+	displayTextLine(1, "%d %f %f", end_loc, robot_X, relGoalPos[0]);
+	displayTextLine(0, "%d %f %f", end_loc, robot_Y, relGoalPos[1]);
 	while(nNxtButtonPressed != kExitButton) {;}
 
 }

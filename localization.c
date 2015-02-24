@@ -7,9 +7,11 @@
 
 bool localized = false;
 int end_loc = 0;
+int record_prevprev = 0;
 int num_till_goal = 100;
 bool stop_lf = false;
 int num_till_goal_copy = num_till_goal;
+
 
 #include <DeadReckoningTests.c>
 typedef struct data
@@ -40,10 +42,12 @@ int numSquaresTillGoal(data* D, int currIndex){
 
 }
 
-void multSensorByCornerArray(data* D){
-	for(int i;i<D->size;i++){
+void multSensorByCornerArray(data* D,bool* turned){
+	playSound(soundLowBuzz);
+	for(int i = 0;i<D->size;i++){
 		D->sensorReadings[i]=(D->sensorReadings[i])*(D->cornerArray[i]);
 	}
+	(*turned)=false;
 }
 
 void shiftProbs(data* D, bool shiftLeft){
@@ -56,7 +60,7 @@ void shiftProbs(data* D, bool shiftLeft){
 			D->probs[i]=D->probs[i+1];
 		}
 		D->probs[(D->size)-1]=firstProb;
-	}else{ //shift right
+		}else{ //shift right
 		float lastProb=D->probs[(D->size)-1];
 		for(i=((D->size)-1);i>0;i--){
 			D->probs[i]=D->probs[i-1];
@@ -85,6 +89,7 @@ void multProbsSensor(data* D){
 	for(i=0;i<((D->size));i++){
 		D->probs[i]=(D->probs[i])*(D->sensorReadings[i]);
 	}
+
 }
 
 //returns -1 if it hasn't found a location,
@@ -117,7 +122,7 @@ void updateSensorReadings(data* D, bool sensedObstacle){
 	for(i=0;i<((D->size));i++){
 		if (sensedObstacle){
 			D->sensorReadings[i]=D->obstacles[i];
-		}else{
+			}else{
 			//put a one for every location without an obstacle
 
 			D->sensorReadings[i]=(float)(((int)(D->obstacles[i]))^1);
@@ -135,30 +140,74 @@ bool hasObstacle(){
 	return false;
 }
 
-void makeUpdates(data* D){
+void makeUpdates(data* D, bool* turned){
 	bool sensedObstacle=hasObstacle();
 	updateSensorReadings(D,sensedObstacle);
+	displayTextLine(0, "%d %d %d %d %d", (int)D->sensorReadings[0], (int)D->sensorReadings[1], (int)D->sensorReadings[2], (int)D->sensorReadings[3], (int)D->sensorReadings[4]);
+	displayTextLine(1, "%d %d %d %d %d", (int)D->sensorReadings[5], (int)D->sensorReadings[6], (int)D->sensorReadings[7], (int)D->sensorReadings[8], (int)D->sensorReadings[9]);
+	//if ((*turned) = true) {
+		//	playSound(soundLowBuzz);
+		//multSensorByCornerArray(D, turned);
+	//}
+	displayTextLine(2, "%d %d %d %d %d", (int)D->sensorReadings[0], (int)D->sensorReadings[1], (int)D->sensorReadings[2], (int)D->sensorReadings[3], (int)D->sensorReadings[4]);
+	displayTextLine(3, "%d %d %d %d %d", (int)D->sensorReadings[5], (int)D->sensorReadings[6], (int)D->sensorReadings[7], (int)D->sensorReadings[8], (int)D->sensorReadings[9]);
+
 	shiftProbs(D,false);
 	multProbsSensor(D);
 }
 
 //float x,float y, float prevUpdateX, float prevUpdateY
-bool shouldMakeUpdate(data* D,float* prevUpdateX,float* prevUpdateY){
+bool shouldMakeUpdate(data* D,float* prevUpdateX,float* prevUpdateY,
+float* prevprevUpdateX, float* prevprevUpdateY, bool* turned){
 	//within a certain interval of where we want to s
 	//we haven't sampled within that interval already
 
 	int oldX=(int)(*prevUpdateX);
 	int oldY=(int)(*prevUpdateY);
+	int oldoldX = (int)(*prevprevUpdateX);
+	int oldoldY = (int)(*prevprevUpdateY);
 	int x=(int)robot_X;
 	int y=(int)robot_Y;
 	int mmPerBlock=(int)D->mmPerBlock;
+	float diffX1;
+	float diffX2;
+	float diffY1;
+	float diffY2;
+	float tolerance = 25;
 
 	if (((abs(x-oldX))>mmPerBlock) || ((abs(y-oldY))>mmPerBlock)){
+		if (record_prevprev == 1) {
+			diffX1 = abs(x - oldX);
+			diffX2 = abs(oldX - oldoldX);
+			diffY1 = abs(y - oldY);
+			diffY2 = abs(oldY - oldoldY);
+
+			float tempX = abs(diffX1 - diffX2);
+			float tempDiffX = abs(tempX - (int)mmPerBlock);
+			float tempY = abs(diffY1 - diffY2);
+			float tempDiffY = abs(tempY - (int)mmPerBlock);
+
+
+			if  ((tempDiffX <tolerance) || (tempDiffY <tolerance)) {
+				//playSound(soundLowBuzz);
+				*turned = true;
+				} else {
+				*turned = false;
+			}
+
+			(*prevprevUpdateX)=(*prevUpdateX);
+			(*prevprevUpdateY)=(*prevUpdateY);
+			} else {
+			(*turned)=false;
+			record_prevprev = 1;
+		}
 		(*prevUpdateX)=robot_X;
 		(*prevUpdateY)=robot_Y;
+
+
 		//playSound(soundBeepBeep);
 		return true;
-	}else{
+		}else{
 		return false;
 	}
 }
@@ -166,54 +215,59 @@ bool shouldMakeUpdate(data* D,float* prevUpdateX,float* prevUpdateY){
 
 void initializeStruct(data* D){
 
-		D->size = 10;
-		D->mmPerBlock = 145.4;
-		D->goalIndex = 0;
+	D->size = 10;
+	D->mmPerBlock = 145.4;
+	D->goalIndex = 0;
 
-		D->obstacles[0] = 0;
-		D->obstacles[1] = 0;
-		D->obstacles[2] = 0;
-		D->obstacles[3]= 1;
-		D->obstacles[4] = 1;
-		D->obstacles[5] = 1;
-		D->obstacles[6] = 1;
-		D->obstacles[7] = 1;
-		D->obstacles[8] = 0;
-		D->obstacles[9] = 1;
-		initProbArray(D);
-    D->cornerArray[0] = 1;
-    D->cornerArray[1] = 0;
-    D->cornerArray[2] = 1;
-    D->cornerArray[3] = 0;
-    D->cornerArray[4] = 0;
-    D->cornerArray[5] = 1;
-    D->cornerArray[6] = 0;
-    D->cornerArray[7] = 1;
-    D->cornerArray[8] = 0;
-    D->cornerArray[9] = 0;
+	D->obstacles[0] = 0;
+	D->obstacles[1] = 1;
+	D->obstacles[2] = 0;
+	D->obstacles[3]= 1;
+	D->obstacles[4] = 0;
+	D->obstacles[5] = 1;
+	D->obstacles[6] = 0;
+	D->obstacles[7] = 1;
+	D->obstacles[8] = 0;
+	D->obstacles[9] = 1;
+	initProbArray(D);
+	D->cornerArray[0] = 1;
+	D->cornerArray[1] = 0;
+	D->cornerArray[2] = 1;
+	D->cornerArray[3] = 0;
+	D->cornerArray[4] = 0;
+	D->cornerArray[5] = 1;
+	D->cornerArray[6] = 0;
+	D->cornerArray[7] = 1;
+	D->cornerArray[8] = 0;
+	D->cornerArray[9] = 0;
 
 }
 
 
 task local_main()
 {
+	float prevprevUpdateX=0;
+	float prevprevUpdateY=0;
 	float prevUpdateX=0;
 	float prevUpdateY=0;
+	bool turned=false;
 	data D;
 	initializeStruct(&D);
-	makeUpdates(&D);
+	makeUpdates(&D,&turned);
 	startTask(dead_reckoning);
 
 	end_loc = foundLocation(&D);
-	displayTextLine(0, "%d %d %d %d %d", (int)D.probs[0], (int)D.probs[1], (int)D.probs[2], (int)D.probs[3], (int)D.probs[4]);
-	displayTextLine(1, "%d %d %d %d %d", (int)D.probs[5], (int)D.probs[6], (int)D.probs[7], (int)D.probs[8], (int)D.probs[9]);
+	//displayTextLine(0, "%d %d %d %d %d", (int)D.probs[0], (int)D.probs[1], (int)D.probs[2], (int)D.probs[3], (int)D.probs[4]);
+	//displayTextLine(1, "%d %d %d %d %d", (int)D.probs[5], (int)D.probs[6], (int)D.probs[7], (int)D.probs[8], (int)D.probs[9]);
 	while(end_loc == -1){
 		//playSound(soundShortBlip);
-		if(shouldMakeUpdate(&D, &prevUpdateX, &prevUpdateY)){
-			makeUpdates(&D);
-		displayTextLine(0, "%d %d %d %d %d", (int)D.probs[0], (int)D.probs[1], (int)D.probs[2], (int)D.probs[3], (int)D.probs[4]);
-		displayTextLine(1, "%d %d %d %d %d", (int)D.probs[5], (int)D.probs[6], (int)D.probs[7], (int)D.probs[8], (int)D.probs[9]);
+		if(shouldMakeUpdate(&D, &prevUpdateX, &prevUpdateY, &prevprevUpdateX, &prevprevUpdateY, &turned)){
+			makeUpdates(&D, &turned);
+			//displayTextLine(0, "%d %d %d %d %d", (int)D.probs[0], (int)D.probs[1], (int)D.probs[2], (int)D.probs[3], (int)D.probs[4]);
+			//displayTextLine(1, "%d %d %d %d %d", (int)D.probs[5], (int)D.probs[6], (int)D.probs[7], (int)D.probs[8], (int)D.probs[9]);
 		}
+		//displayTextLine(2, "%d %d %d ", (int)prevprevUpdateX, (int)prevUpdateX, (int)robot_X);
+		//displayTextLine(3, "%d %d %d ", (int)prevprevUpdateY, (int)prevUpdateY, (int)robot_Y);
 		end_loc = foundLocation(&D);
 	}
 	num_till_goal = numSquaresTillGoal(&D, end_loc);
@@ -222,17 +276,14 @@ task local_main()
 	playSound(soundDownwardTones);
 
 	while(num_till_goal > 0){
-		if(shouldMakeUpdate(&D, &prevUpdateX, &prevUpdateY)){
+		if(shouldMakeUpdate(&D, &prevUpdateX, &prevUpdateY, &prevprevUpdateX, &prevprevUpdateY, &turned)){
 			num_till_goal = num_till_goal-1;
 		}
 	}
 	stop_lf = true;
 
-		displayTextLine(0, "%d %d %d %d %d", (int)D.probs[0], (int)D.probs[1], (int)D.probs[2], (int)D.probs[3], (int)D.probs[4]);
-		displayTextLine(1, "%d %d %d %d %d", (int)D.probs[5], (int)D.probs[6], (int)D.probs[7], (int)D.probs[8], (int)D.probs[9]);
-
 	while(true){
 		int x = 1;
 	}
- // team WAtermallan is the best at everything in das haus.
+	// team WAtermallan is the best at everything in das haus.
 }
