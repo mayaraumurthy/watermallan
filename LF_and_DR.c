@@ -1,4 +1,4 @@
-#pragma config(Sensor, S1,     lightSensor,    sensorLightActive)
+	#pragma config(Sensor, S1,     lightSensor,    sensorLightActive)
 #pragma config(Sensor, S2,     sonarSensor,    sensorSONAR)
 #pragma config(Motor,  motorA,          motorRight,    tmotorNXT, PIDControl, encoder)
 #pragma config(Motor,  motorB,          motorLeft,     tmotorNXT, PIDControl, encoder)
