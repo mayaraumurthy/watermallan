@@ -32,8 +32,15 @@ task main()
 	startTask(local_main);
 	int currSensorVal;
 	while(!stop_lf){
+		//While we have not reached the goal.
+	 //stop_lf is set in localization
+
+
+	//does all the line following /////
 		displayTextLine(6, "X: %f", SensorValue[sonarSensor]);
 		currSensorVal=SensorValue[lightSensor];
+
+		//get error
 		if ((desiredMin <= currSensorVal) && ( currSensorVal <= desiredMax)) {
 		  error = 0;
 		  blackTime = 0;
@@ -45,6 +52,7 @@ task main()
 	    blackTime = 0;
 	  }
 		turn=(int)(k*((float)error));
+		/// check for very sharp turns
 		if (blackTime > blackThreshold) {
 			powerR = -50;
 			powerL = 10;
@@ -59,7 +67,7 @@ task main()
 	  	}
 	  	continue;
 		} else{
-		  if (turn == 0) {
+		  if (turn == 0) { // set motor values based on errors
 			  powerR = defaultPower;
 			  powerL = defaultPower;
 	    } else if (turn > 0) {
@@ -76,9 +84,9 @@ task main()
 		motor[motorRight]=powerR;
 		prevError=error;
 		oldSensorVal=currSensorVal;
-
+	//// end line following code.
 	}
-	 //displayTextLine(5, "loc %d  ", end_loc);
+
 	  motor[motorLeft]=0;
 		motor[motorRight]=0;
 		nNxtButtonTask  = 0;
