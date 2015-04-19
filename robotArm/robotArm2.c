@@ -26,24 +26,21 @@ float getGoalDegree1(float x, float y, float theta2){
 	return alpha - asin( (L2 * sin (theta2)) / sqrt( (x * x) + (y*y)));
 }
 
-void goToDegree(int d){
-}
-
 
 void goToDegree(float r1,float r2){ //DON'T FORGET TO RESET ENCODER VALUE TO BE ZERO AT THE BEGINNING
-	nMotorEncoderTarget[motorA]=r1*180/PI;
-	nMotorEncoderTarget[motorB]=r2*180/PI;
-	motor[motorA]=50;
+	nMotorEncoderTarget[Arm1]=r1*180/PI;
+	nMotorEncoderTarget[Arm2]=r2*180/PI;
+	motor[Arm1]=50;
 	float allowedError=5*PI/180;
-	while ((abs((nMotorEncoder[motorA])-r1))<allowedError){
+	while ((abs((nMotorEncoder[Arm1])-r1))<allowedError){
 		wait10Msec(1);
 	}
-	motor[motorA]=0;;
-	motor[motorB]=50;
-	while ((abs((nMotorEncoder[motorB])-r2))<allowedError){
+	motor[Arm1]=0;;
+	motor[Arm2]=50;
+	while ((abs((nMotorEncoder[Arm2])-r2))<allowedError){
 		wait10Msec(1);
 	}
-	motor[motorB]=0;
+	motor[Arm2]=0;
 }
 
 int fromRadianToBox(float radian){
@@ -56,10 +53,4 @@ float fromBoxToRadian(int box){
 
 void goToExactGoal(float goalR1, float goalR2){
 	goToDegree(goalR1,goalR2);
-}
-
-task main()
-{
-
-
 }
