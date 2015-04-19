@@ -3,7 +3,7 @@
 //#include <assert.h>
 typedef struct space
 {
-	int matrix[16][8]; //change to fit gridsize
+	int matrix[8][15]; //change to fit gridsize
 	int rows;
 	int cols;
 } space;
@@ -314,7 +314,7 @@ void calcPath(path* pathArray, int goalRow, int goalCol, int startRow, int start
 {
 
 
-  S_full.matrix[0][3] = 1;S_full.matrix[0][4] = 1;
+  /*S_full.matrix[0][3] = 1;S_full.matrix[0][4] = 1;
   S_full.matrix[1][3] = 1;S_full.matrix[1][4] = 1;
   S_full.matrix[2][2] = 1;S_full.matrix[2][3] = 1;S_full.matrix[2][4] = 1;
   S_full.matrix[3][2] = 1;S_full.matrix[3][3] = 1;
@@ -328,10 +328,10 @@ void calcPath(path* pathArray, int goalRow, int goalCol, int startRow, int start
   S_full.matrix[11][5] = 1;S_full.matrix[11][6] = 1;
   S_full.matrix[12][3] = 1;S_full.matrix[12][4] = 1;S_full.matrix[12][5] = 1;
   S_full.matrix[13][4] = 1;S_full.matrix[13][5] = 1;S_full.matrix[13][6] = 1;S_full.matrix[13][7] = 1;
-  S_full.matrix[14][6] = 1;S_full.matrix[14][7] = 1;
+  S_full.matrix[14][6] = 1;S_full.matrix[14][7] = 1;*/
 
-	S_full.cols = 8;
-	S_full.rows = 16;
+	S_full.cols = 15;
+	S_full.rows = 8;
 	wavefront(goalRow,goalCol,&S_full);
 
 	findPath(&S_full,startRow,startCol,pathArray,1,0);

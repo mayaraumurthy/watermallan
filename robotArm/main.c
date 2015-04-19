@@ -5,8 +5,8 @@
 #include "robotArm2.c"
 #include "waveFrontDir2.c"
 
-float XA;
-float YA;
+float XA = 3.75;
+float YA = 2.5;
 
 float XB;
 float YB;
@@ -25,29 +25,27 @@ path pathArray;
 
 void goToTarget(float X, float Y)
 {
-	nMotorEncoder[Arm1] = 0;
-	nMotorEncoder[Arm2] = 0;
 	////    SETUP //////////////////////////////////
 
 	//CHANGE THIS TO CHECK WHETHER THESE ARE VALID
-	goalDeg2 = getGoalDegree2(X, Y, true);
-	goalDeg1 = getGoalDegree1(X, Y, goalDeg2);
+	float goalRad2 = (getGoalDegree2(X, Y, true);
+	float goalRad1 = getGoalDegree1(X, Y, goalDeg2);
+
+	goalDeg1 = radiansToDegrees(goalRad1);
+	goalDeg2 = radiansToDegrees(goalRad2);
 	//CHANGE THIS TO CHECK WHETHER THESE ARE VALID
 
-	goalCol = fromRadianToBox(goalDeg1);
-	goalRow = fromRadianToBox(goalDeg2);
+	goalCol = fromDegreesToBox(goalDeg1);
+	goalRow = fromDegreesToBox(goalDeg2);
 
 	calcPath(&pathArray, goalRow, goalCol, startRow, startCol);
 
 	///////////// END SETUP///////////////////////////
 
-	nMotorEncoder[Arm1] = 0;
-	nMotorEncoder[Arm2] = 0;
-
 	int i = 0;
 	while( i < pathArray.pathLength){
-		int theta1 = fromBoxToRadian(pathArray.waypoints[i].c);
-		int theta2 = fromBoxToRadian(pathArray.waypoints[i].r);
+		int theta1 = fromBoxToDegrees(pathArray.waypoints[i].c);
+		int theta2 = fromBoxToDegrees(pathArray.waypoints[i].r);
 		goToDegree(theta1, theta2);
 		i = i + 1;
 	}
@@ -60,7 +58,7 @@ void goToTarget(float X, float Y)
 
 task main{
 	nMotorEncoder[Arm1] = 0;
-	nMotorEncoder[Arm2] = 0;
+	nMotorEncoder[Arm2] = 180;
 
 	goToTarget(XA, YA);
 }
