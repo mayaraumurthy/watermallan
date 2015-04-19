@@ -31,7 +31,7 @@ task main()
 	float flipPos = 0;
 	int stairMode = 1;
 
-	float dir = 1;
+	float dir = -1;
 	bool prevline_button = false;
 	bool prevrev_button = false;
 	nMotorEncoder[flipMotor] = 0;
@@ -40,10 +40,12 @@ task main()
 	while(true){
 		getJoystickSettings(joystick);
 		if(joystick.joy1_Buttons == line_button && !prevline_button){
-			if(line_mode == 1){
-				line_reset();
-			}
-			line_mode = line_mode * -1;
+				if(abs(dir) > 0.75){
+					dir = dir * 0.1;
+				}
+				else if(abs(dir) < 0.75){
+					dir = dir * 10;
+				}
 		}
 		if(line_mode == 1){
 			if(joystick.joy1_Buttons == rev_button && ! prevrev_button){
@@ -89,13 +91,12 @@ task main()
 				motor[leftMotor] = 0;
 			}
 		}
-
 			//flipper controller
 			if(joystick.joy1_Buttons == slow_button){
-				motor[flipMotor] = -100;
+				motor[flipMotor] = -50;
 			}
 			else if(joystick.joy1_Buttons == fast_button){
-				motor[flipMotor] = 100;
+				motor[flipMotor] = 50;
 			}
 			//camera controller
 			else if(joystick.joy1_TopHat == 6){
@@ -109,7 +110,7 @@ task main()
 			}
 		}
 		else{
-			line_following();
+
 		}
 		displayTextLine(4, "encoder : %d  ", nmotorEncoder[flipMotor]);
 		displayTextLine(6, "lightSensor %d  ", sensorValue[lightSensor]);

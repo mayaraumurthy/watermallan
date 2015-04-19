@@ -3,7 +3,7 @@
 //#include <assert.h>
 typedef struct space
 {
-	int matrix[16][8];
+	int matrix[16][8]; //change to fit gridsize
 	int rows;
 	int cols;
 } space;
@@ -35,7 +35,7 @@ typedef struct path{
 }path;
  //#define NULL ((void *)0)
 
-node neighbors[500];
+node neighbors[500]; /// might need to be changed to handle larger grid
 loc temp[100];
 
 bool is4pt=true;
