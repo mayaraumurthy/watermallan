@@ -36,6 +36,7 @@ typedef struct path{
 	loc waypoints[100];
 	int pathLength;
 	float dir[2];
+	bool validPath;
 }path;
  //#define NULL ((void *)0)
 
@@ -320,24 +321,54 @@ void calcPath(path* pathArray, int goalRow, int goalCol, int startRow, int start
 {
 
 
-  /*S_full.matrix[0][3] = 1;S_full.matrix[0][4] = 1;
-  S_full.matrix[1][3] = 1;S_full.matrix[1][4] = 1;
-  S_full.matrix[2][2] = 1;S_full.matrix[2][3] = 1;S_full.matrix[2][4] = 1;
-  S_full.matrix[3][2] = 1;S_full.matrix[3][3] = 1;
-  S_full.matrix[4][3] = 1;S_full.matrix[4][4] = 1;S_full.matrix[4][5] = 1;
-  S_full.matrix[5][2] = 1;S_full.matrix[5][3] = 1;S_full.matrix[5][4] = 1;S_full.matrix[5][5] = 1;
-  S_full.matrix[6][2] = 1;S_full.matrix[6][3] = 1;S_full.matrix[6][4] = 1;
-  S_full.matrix[7][3] = 1;S_full.matrix[7][4] = 1;
-  S_full.matrix[8][3] = 1;S_full.matrix[8][4] = 1;S_full.matrix[8][5] = 1;
-  S_full.matrix[9][1] = 1;S_full.matrix[9][2] = 1;S_full.matrix[9][4] = 1;
-  S_full.matrix[10][1] = 1;S_full.matrix[10][2] = 1;S_full.matrix[10][6] = 1;
-  S_full.matrix[11][5] = 1;S_full.matrix[11][6] = 1;
-  S_full.matrix[12][3] = 1;S_full.matrix[12][4] = 1;S_full.matrix[12][5] = 1;
-  S_full.matrix[13][4] = 1;S_full.matrix[13][5] = 1;S_full.matrix[13][6] = 1;S_full.matrix[13][7] = 1;
-  S_full.matrix[14][6] = 1;S_full.matrix[14][7] = 1;*/
+  S_full.matrix[0][0] = 1;S_full.matrix[0][1] = 1;
+  S_full.matrix[1][0] = 1;S_full.matrix[1][1] = 1;
+  S_full.matrix[2][0] = 1;S_full.matrix[2][1] = 1;
+  S_full.matrix[3][0] = 1;S_full.matrix[3][1] = 1;
+  S_full.matrix[4][0] = 1;S_full.matrix[4][1] = 1;
+  S_full.matrix[5][0] = 1;S_full.matrix[5][1] = 1;
+  S_full.matrix[6][0] = 1;S_full.matrix[6][1] = 1;
+  S_full.matrix[7][0] = 1;S_full.matrix[8][0] = 1;
 
-	S_full.cols = 10;
+
+ S_full.matrix[6][4] = 1;S_full.matrix[6][5] = 1; S_full.matrix[6][6] = 1;
+ S_full.matrix[7][4] = 1;S_full.matrix[7][5] = 1; S_full.matrix[7][6] = 1;
+ S_full.matrix[8][3] = 1;S_full.matrix[8][4] = 1;S_full.matrix[8][5] = 1;
+ S_full.matrix[9][3] = 1;S_full.matrix[9][4] = 1;S_full.matrix[9][5] = 1;
+ S_full.matrix[10][2] = 1;S_full.matrix[10][3] = 1;S_full.matrix[10][4] = 1;S_full.matrix[10][5] = 1;
+ S_full.matrix[11][2] = 1;S_full.matrix[11][3] = 1;S_full.matrix[10][4] = 1;
+
+ S_full.matrix[9][8]=1;
+S_full.matrix[10][8]=1;
+S_full.matrix[11][8]=1;
+S_full.matrix[12][8]=1;
+S_full.matrix[13][8]=1;
+S_full.matrix[14][8]=1;
+S_full.matrix[15][8]=1;
+S_full.matrix[16][8]=1;
+S_full.matrix[17][8]=1;
+
+S_full.matrix[12][7]=1;
+S_full.matrix[13][7]=1;
+S_full.matrix[14][7]=1;
+S_full.matrix[15][7]=1;
+S_full.matrix[16][7]=1;
+S_full.matrix[17][7]=1;
+
+  S_full.cols = 10;
 	S_full.rows = 19;
+	pathArray->validPath = false;
+
+	if(goalRow > 0 && goalCol < S_full.rows){
+		if(goalCol > 0 && goalRow < S_full.rows){
+				if(S_full.matrix[goalRow][goalCol] == 1) return;
+		}
+		else return;
+	}
+	else return;
+
+
+	pathArray->validPath = true;
 	wavefront(goalRow,goalCol,&S_full);
 
 	findPath(&S_full,startRow,startCol,pathArray,1,0);

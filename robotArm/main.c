@@ -4,6 +4,7 @@
 
 #include "robotArm2.c"
 #include "waveFrontDir2.c"
+#include "results.c"
 
 float XA = 3.75;
 float YA = 2.5;
@@ -23,22 +24,68 @@ float startCol = 0;
 
 path pathArray;
 
-void goToTarget(float X, float Y)
-{
-	////    SETUP //////////////////////////////////
+void calcPath(){
+	goalCol = fromDegreesToBox(goalDeg1);
+	goalRow = fromDegreesToBox(goalDeg2 );
+	calcPath(&pathArray, goalRow, goalCol, startRow, startCol);
+	if(pathArray.validPath) return;
 
-	//CHANGE THIS TO CHECK WHETHER THESE ARE VALID
+	goalCol = fromDegreesToBox(goalDeg1 - 20);
+	goalRow = fromDegreesToBox(goalDeg2 );
+	calcPath(&pathArray, goalRow, goalCol, startRow, startCol);
+	if(pathArray.validPath) return;
+
+	goalCol = fromDegreesToBox(goalDeg1 + 20);
+	goalRow = fromDegreesToBox(goalDeg2 );
+	calcPath(&pathArray, goalRow, goalCol, startRow, startCol);
+	if(pathArray.validPath) return;
+
+	goalCol = fromDegreesToBox(goalDeg1);
+	goalRow = fromDegreesToBox(goalDeg2 - 20 );
+	calcPath(&pathArray, goalRow, goalCol, startRow, startCol);
+	if(pathArray.validPath) return;
+
+
+	goalCol = fromDegreesToBox(goalDeg1);
+	goalRow = fromDegreesToBox(goalDeg2 + 20 );
+	calcPath(&pathArray, goalRow, goalCol, startRow, startCol);
+	if(pathArray.validPath) return;
+}
+
+void findTheta(float X, float Y){
+	initializeThing();
+
 	float goalRad2 = (getGoalDegree2(X, Y, false);
 	float goalRad1 = getGoalDegree1(X, Y, goalRad2);
 
 	goalDeg1 = radiansToDegrees(goalRad1);
 	goalDeg2 = radiansToDegrees(goalRad2);
+
+	if(goalDeg1 >= 0 && goalDeg1 <= 180){
+		if(goalDeg2 < Meena.matrix[goalDeg1][0] || goalDeg2 > Meena.matrix[goalDeg1][0]) return;
+	}
+
+	goalRad2 = (getGoalDegree2(X, Y, true);
+	goalRad1 = getGoalDegree1(X, Y, goalRad2);
+
+	goalDeg1 = radiansToDegrees(goalRad1);
+	goalDeg2 = radiansToDegrees(goalRad2);
+
+	if(goalDeg1 >= 0 && goalDeg1 <= 180){
+		if(goalDeg2 < Meena.matrix[goalDeg1][0] || goalDeg2 > Meena.matrix[goalDeg1][0]) return;
+	}
+
+}
+
+void goToTarget(float X, float Y)
+{
+	////    SETUP //////////////////////////////////
+
+	//CHANGE THIS TO CHECK WHETHER THESE ARE VALID
+	findTheta(X, Y);
 	//CHANGE THIS TO CHECK WHETHER THESE ARE VALID
 
-	goalCol = fromDegreesToBox(goalDeg1);
-	goalRow = fromDegreesToBox(goalDeg2);
-
-	calcPath(&pathArray, goalRow, goalCol, startRow, startCol);
+	calcPath();
 
 	///////////// END SETUP///////////////////////////
 
@@ -55,6 +102,8 @@ void goToTarget(float X, float Y)
 	startRow = goalRow;
 	startCol = goalCol;
 }
+
+
 
 task main{
 
