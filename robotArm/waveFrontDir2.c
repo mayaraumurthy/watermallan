@@ -1,9 +1,13 @@
 //#include <stdbool.h>
 //#include <stdio.h>
 //#include <assert.h>
+
+
+int check11;
+int check22;
 typedef struct space
 {
-	int matrix[8][15]; //change to fit gridsize
+	int matrix[19][10]; //change to fit gridsize
 	int rows;
 	int cols;
 } space;
@@ -271,6 +275,8 @@ void wavefront(int r,int c, space* S){
 	node firstNode;
 	firstNode.r=r;
 	firstNode.c=c;
+	check11 = r;
+	check22 = c;
 	S->matrix[r][c]=label;
 
 
@@ -330,8 +336,8 @@ void calcPath(path* pathArray, int goalRow, int goalCol, int startRow, int start
   S_full.matrix[13][4] = 1;S_full.matrix[13][5] = 1;S_full.matrix[13][6] = 1;S_full.matrix[13][7] = 1;
   S_full.matrix[14][6] = 1;S_full.matrix[14][7] = 1;*/
 
-	S_full.cols = 15;
-	S_full.rows = 8;
+	S_full.cols = 10;
+	S_full.rows = 19;
 	wavefront(goalRow,goalCol,&S_full);
 
 	findPath(&S_full,startRow,startCol,pathArray,1,0);
