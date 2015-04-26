@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 %COM_CloseNXT all
 %h = COM_OpenNXT('bluetooth.ini');
 %COM_SetDefaultNXT(h)
@@ -6,24 +7,42 @@ offset = .08; %forward
 
 myId = 7; % CHANGE ME: We will tell you what your tag's id is
 enemyID = 7;
+% Example HowiePositioningSystem Usage
+% Example team's tag id is 1, their opponent's tag id is 40
+
+COM_CloseNXT all
+hNXT = COM_OpenNXT('bluetooth.ini');
+COM_SetDefaultNXT(hNXT)
+
+myId = 7;
+enemyId = 17;
 
 HPS = HowiePositioningSystem;
 
 ids = HPS.getVisibleIds();
+% ids => [1; 40] (for example)
 
+<<<<<<< HEAD
 enX_Prev =0;
 enY_Prev = 0;
 enTh_Prev = 0;
 
+=======
+% Your main loop
+>>>>>>> d618e21fcfa47e047476d605de620011926c82fa
 while true
     myPosition = HPS.getPosition(myId);
-    enPosition = HPS.getPosition(enemyID);
+    enemyPosition = HPS.getPosition(enemyId);
     
-    enX = enPosition.x;
-    enY = enPosition.y;
-    enTh = enPosition.th; 
+    % Do something with myPosition
+    % You can access the x, y, and theta values like this:
     
+<<<<<<< HEAD
     
+=======
+    myX = myPosition.x;
+    myY = myPosition.y;
+>>>>>>> d618e21fcfa47e047476d605de620011926c82fa
     myTh = myPosition.th;
     myX = myPosition.x + .08*cos(myTh);  %% + offset relating to theta
     myY = myPosition.y + .08*sin(myTh); %% + offset relating to theta
@@ -43,4 +62,14 @@ while true
     
     corners = getCorner(HPS);
     
+    enemyX = enemyPosition.x;
+    enemyY = enemyPosition.y;
+    enemyTh = enemyPosition.th;   
+    
+    corners = getCorner(HPS);
+    
+    % Here we'll just print the position out
+    disp('My position');
+    disp(myPosition);
 end
+    
