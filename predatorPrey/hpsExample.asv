@@ -2,9 +2,11 @@
 % Example team's tag id is 1, their opponent's tag id is 40
 
 
-%COM_CloseNXT all
-%h = COM_OpenNXT('bluetooth.ini');
+COM_CloseNXT all
+h = COM_OpenNXT('bluetooth.ini');
 COM_SetDefaultNXT(h)
+
+
 
 myId = 9; % CHANGE ME: We will tell you what your tag's id is
 

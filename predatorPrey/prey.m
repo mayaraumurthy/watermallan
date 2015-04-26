@@ -1,31 +1,27 @@
-% Example HowiePositioningSystem Usage
-% Example team's tag id is 1, their opponent's tag id is 40
-
-
 %COM_CloseNXT all
 %h = COM_OpenNXT('bluetooth.ini');
 COM_SetDefaultNXT(h)
 
 myId = 9; % CHANGE ME: We will tell you what your tag's id is
+enemyID = 1;
 
 HPS = HowiePositioningSystem;
 
 ids = HPS.getVisibleIds();
-% ids => [1; 40] (for example)
 
-% Your main loop
 while true
     myPosition = HPS.getPosition(myId);
+    enPosition = HPS.getPosition(enemyID);
     
-    % Do something with myPosition
-    % You can access the x, y, and theta values like this:
+    enX = enPosition.x;
+    enY = enPosition.y;
+    enTh = enPosition.th; 
     
-    myX = myPosition.x;
-    myY = myPosition.y;
+    myX = myPosition.x;  %% + offset relating to theta
+    myY = myPosition.y; %% + offset relating to theta
     myTh = myPosition.th;
     
     % Here we'll just print the position out
     disp('My position');
     disp(myPosition);
 end
-    
