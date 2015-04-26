@@ -36,11 +36,10 @@ float getGoalDegree1(float x, float y, float theta2){
 
 
 void goToDegree(float r1,float r2){ //DON'T FORGET TO RESET ENCODER VALUE TO BE ZERO AT THE BEGINNING
-	displayTextLine(1, "arm1: %f", nMotorEncoder[Arm1]);
-	displayTextLine(2, "arm2: %f", nMotorEncoder[Arm2]);
-	int target1 = r1 * GR;
+	int target1 = (r1-180) * GR;
 	int target2 = (r2 - 180) * GR;
-
+	displayTextLine(1, "arm1: %f", r1);
+	displayTextLine(2, "arm2: %f", r2);
 
 	int currVal1 = nMotorEncoder[Arm1];
 	while(currVal1 != target1){
@@ -59,6 +58,7 @@ void goToDegree(float r1,float r2){ //DON'T FORGET TO RESET ENCODER VALUE TO BE 
 	}
 
 	motor[Arm2] = 0;
+
 }
 
 int fromDegreesToBox(float radian){

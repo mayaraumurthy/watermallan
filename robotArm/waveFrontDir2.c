@@ -2,9 +2,6 @@
 //#include <stdio.h>
 //#include <assert.h>
 
-
-int check11;
-int check22;
 typedef struct space
 {
 	int matrix[19][10]; //change to fit gridsize
@@ -41,6 +38,7 @@ typedef struct path{
  //#define NULL ((void *)0)
 
 node neighbors[500]; /// might need to be changed to handle larger grid
+
 loc temp[100];
 
 bool is4pt=true;
@@ -276,8 +274,6 @@ void wavefront(int r,int c, space* S){
 	node firstNode;
 	firstNode.r=r;
 	firstNode.c=c;
-	check11 = r;
-	check22 = c;
 	S->matrix[r][c]=label;
 
 
@@ -315,13 +311,16 @@ void wavefront(int r,int c, space* S){
 
 }
 
+void initializeStuff(path *pathArray){
+  S_full.cols = 10;
+	S_full.rows = 19;
 
-
-void calcPath(path* pathArray, int goalRow, int goalCol, int startRow, int startCol)
-{
-
-
-  S_full.matrix[0][0] = 1;S_full.matrix[0][1] = 1;
+	for(int i = 0; i < S_full.rows; i++){
+		for(int j = 0; j < S_full.cols; j++){
+			S_full.matrix[i][j] = 0;
+		}
+	}
+	S_full.matrix[0][0] = 1;S_full.matrix[0][1] = 1;
   S_full.matrix[1][0] = 1;S_full.matrix[1][1] = 1;
   S_full.matrix[2][0] = 1;S_full.matrix[2][1] = 1;
   S_full.matrix[3][0] = 1;S_full.matrix[3][1] = 1;
@@ -332,11 +331,12 @@ void calcPath(path* pathArray, int goalRow, int goalCol, int startRow, int start
 
 
  S_full.matrix[6][4] = 1;S_full.matrix[6][5] = 1; S_full.matrix[6][6] = 1;
- S_full.matrix[7][4] = 1;S_full.matrix[7][5] = 1; S_full.matrix[7][6] = 1;
- S_full.matrix[8][3] = 1;S_full.matrix[8][4] = 1;S_full.matrix[8][5] = 1;
+ S_full.matrix[7][4] = 1;S_full.matrix[7][5] = 1; S_full.matrix[7][6] = 1;S_full.matrix[7][3] = 1;
+ S_full.matrix[8][3] = 1;S_full.matrix[8][4] = 1;S_full.matrix[8][5] = 1;S_full.matrix[8][6] = 1;
  S_full.matrix[9][3] = 1;S_full.matrix[9][4] = 1;S_full.matrix[9][5] = 1;
  S_full.matrix[10][2] = 1;S_full.matrix[10][3] = 1;S_full.matrix[10][4] = 1;S_full.matrix[10][5] = 1;
- S_full.matrix[11][2] = 1;S_full.matrix[11][3] = 1;S_full.matrix[10][4] = 1;
+ S_full.matrix[11][2] = 1;S_full.matrix[11][3] = 1;S_full.matrix[10][4] = 1;S_full.matrix[12][2]
+ S_full.matrix[12][5] = 1;S_full.matrix[12][4] = 1;
 
  S_full.matrix[9][8]=1;
 S_full.matrix[10][8]=1;
@@ -355,9 +355,31 @@ S_full.matrix[15][7]=1;
 S_full.matrix[16][7]=1;
 S_full.matrix[17][7]=1;
 
-  S_full.cols = 10;
-	S_full.rows = 19;
+	for(int i = 0; i < 500; i++){
+		neighbors[i].r = 0;
+		neighbors[i].c = 0;
+		neighbors[i].prev = NULL;
+		neighbors[i].next = NULL;
+	}
+
 	pathArray->validPath = false;
+	pathArray->pathLength = 0;
+	for(int i = 0; i < 100; i ++){
+		pathArray->waypoints[i].r = 0;
+		pathArray->waypoints[i].c = 0;
+		pathArray->waypoints[i].dist = 0;
+		temp[i].r = 0;
+		temp[i].c = 0;
+		temp[i].dist = 0;
+	}
+
+}
+
+
+
+void calcPath(path* pathArray, int goalRow, int goalCol, int startRow, int startCol)
+{
+	initializeStuff(pathArray);
 
 	if(goalRow > 0 && goalCol < S_full.rows){
 		if(goalCol > 0 && goalRow < S_full.rows){
