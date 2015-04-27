@@ -7,6 +7,7 @@ COM_SetDefaultNXT(hNXT)
 
 myId = 9;
 enemyId = 17;
+flag = 0; % 0 = we are the prey, 1 = we are the predator 
 
 HPS = HowiePositioningSystem;
 
