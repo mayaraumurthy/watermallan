@@ -1,0 +1,33 @@
+function [MP1, MP2] = makeMove (base, currX, currY, currTh, goalX, goalY)
+    
+    %every input should be the value in the camera frame.
+    %base: the struct coordinates of corner (0,0).
+    
+    
+
+    offX = 3.5;
+    offY = 0;
+    k = 10000;
+    L = 6.75;
+    R = 1.5;
+    
+    currX = cos(currTh) * offX + currX;
+    currY = sin(currTh) * offX + currY;
+    
+    currX = -sin(currTh) * offY + currX;
+    currY = cos(currTh) * offY + currY;
+    
+    distX = (goalX - currX) * k;
+    distY = (goalY - currY) * k;
+    
+    M = [cos(currTh) - sin(currTh) * offY / offX, ...
+         sin(currTh) + cos(currTh) * offY / offX; ...
+         -sin(currTh) / offX, cos(currTh) / offX];
+    velocity = M * [distX; distY];
+    v = velocity(1);
+    w = velocity(2);
+    
+    MP1 = 90/pi * (2*v - L*w) / R;
+    MP2 = 90/pi * (2*v + L*w) / R;
+
+end

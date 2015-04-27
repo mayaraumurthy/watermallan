@@ -5,7 +5,7 @@ COM_CloseNXT all
 hNXT = COM_OpenNXT('bluetooth.ini');
 COM_SetDefaultNXT(hNXT)
 
-myId = 9;
+myId = 7;
 enemyId = 17;
 flag = 0; % 0 = we are the prey, 1 = we are the predator 
 
