@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 %COM_CloseNXT all
 %h = COM_OpenNXT('bluetooth.ini');
 %COM_SetDefaultNXT(h)
@@ -22,14 +22,11 @@ HPS = HowiePositioningSystem;
 ids = HPS.getVisibleIds();
 % ids => [1; 40] (for example)
 
-<<<<<<< HEAD
 enX_Prev =0;
 enY_Prev = 0;
 enTh_Prev = 0;
 
-=======
 % Your main loop
->>>>>>> d618e21fcfa47e047476d605de620011926c82fa
 while true
     myPosition = HPS.getPosition(myId);
     enemyPosition = HPS.getPosition(enemyId);
@@ -37,12 +34,8 @@ while true
     % Do something with myPosition
     % You can access the x, y, and theta values like this:
     
-<<<<<<< HEAD
-    
-=======
     myX = myPosition.x;
     myY = myPosition.y;
->>>>>>> d618e21fcfa47e047476d605de620011926c82fa
     myTh = myPosition.th;
     myX = myPosition.x + .08*cos(myTh);  %% + offset relating to theta
     myY = myPosition.y + .08*sin(myTh); %% + offset relating to theta
@@ -58,8 +51,7 @@ while true
     
     x_diff = (enX - myX);
     y_diff = (enY - myY); 
-    
-    
+    pi
     corners = getCorner(HPS);
     
     enemyX = enemyPosition.x;
@@ -68,8 +60,5 @@ while true
     
     corners = getCorner(HPS);
     
-    % Here we'll just print the position out
-    disp('My position');
-    disp(myPosition);
 end
     

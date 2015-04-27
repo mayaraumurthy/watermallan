@@ -39,7 +39,7 @@ while true
     myY = myPosition.y + .08*sin(myTh); %% + offset relating to theta
     
     
-    pos = nextPos(myX,myY,enemyPosition.x,enemyPosition.y,0.2,1,8,0.12, corners(1,1).x,corners(2,2).x,corners(1,1).y,corners(2,2).y);
+    pos = nextPos(myX,myY,enemyPosition.x,enemyPosition.y,0.2,1,8,0.1, corners(1,1).x,corners(2,2).x,corners(1,1).y,corners(2,2).y);
     
     [P1, P2] = makeMove(corners(1,1).x, corners(1,1).y, myX,myY,myTh, pos(1), pos(2));
     
@@ -86,7 +86,7 @@ function validPos =filterNotValidPos(possiblePos,xL,xH,yL,yH,m)
         preyX=possiblePos(1,i);
         preyY=possiblePos(2,i);
         
-        if (~((preyX<(xL+m))||(preyY<(yL+m))||(preyX>(xH-m))||(preyY>(yH-m))))
+        if (~((preyX<(XL + m))||(abs(preyX-xH)<m)||(abs(preyY-yL)<m) ||(abs(preyY-yH)<m)))
             validPos=horzcat(validPos,[preyX ;preyY]);
         end
         
