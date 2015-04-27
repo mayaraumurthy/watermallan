@@ -46,8 +46,8 @@ while true
     
     timeStep = 360;
     
-    motor2 = NXTMotor('A', 'Power', P1);
-    motor1 = NXTMotor('B', 'Power', P2);
+    motor1 = NXTMotor('B', 'Power', P1);
+    motor2 = NXTMotor('B', 'Power', P2);
     
     motor1.SendToNXT();
     motor2.SendToNXT();
