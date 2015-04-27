@@ -1,5 +1,6 @@
 function output=prey3_dumb(input)
 
+
 %COM_CloseNXT all
 %h = COM_OpenNXT('bluetooth.ini');
 %COM_SetDefaultNXT(h)
@@ -12,7 +13,7 @@ enemyID = 7;
 % Example team's tag id is 1, their opponent's tag id is 40
 
 myId = 7;
-enemyId = 7;
+enemyId = 17;
 
 HPS = HowiePositioningSystem;
 
@@ -36,36 +37,28 @@ corners = getCorner(HPS);
     myX = myPosition.x + .08*cos(myTh);  %% + offset relating to theta
     myY = myPosition.y + .08*sin(myTh); %% + offset relating to theta
     turnToEdge(myTh, 0);
-    %disp(myTh / (2*pi) * 360);
-        
-        
 %end
 end
 
 function output = turnToEdge(myTh, edge)
-    disp(myTh / (2*pi) * 360);
-    ratio = 60;
+    ratio = 60
     L = 6.75;  %dist of wheel base
     R = 1.5;  %radius of wheel
 
     desiredTh = edge * (pi/2);
-    disp(desiredTh/ (2*pi) * 360);
     circ = pi * L;
-    dist = (abs(myTh - desiredTh) / (2 * pi)) * circ;
-    one_dist = dist;
-    rot = (one_dist / (pi * 2 * R)) * (360);
-    disp(rot);
-    motor1 = NXTMotor('A', 'Power', 100, 'TachoLimit', floor(rot));
-    motor2 = NXTMotor('B', 'Power', -100, 'TachoLimit',  floor(rot));
-    motor1.SendToNXT();
-    motor2.SendToNXT();
-    motor1.WaitFor();
-    motor2.WaitFor();
+    dist = (myTh - desiredTh) / (2 * pi)) * circ;
+    one_dist = dist / 2;
+    rot = (one_dist / (pi * 2 * R)) * (360)
+    motor1 = NXTMotor('A', 'Power', 100, 'TachoLimit', rot);
+    motor2 = NXTMotor('B', 'Power', -100, 'TachoLimit',  rot);
+    motor1.sendToNxt();
+    motor2.sendToNxt();
 end
     
     
 
-function output = goToEdge(~, myY, myTh, enemyPos, corners)
+function output = goToEdge(myX, myY, myTh, enemyPos, corners)
     
 
 

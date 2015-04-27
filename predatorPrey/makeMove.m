@@ -15,7 +15,7 @@ function [MP1, MP2] = makeMove (baseX, baseY, currX, currY, currTh, goalX, goalY
     offX = 3.5;  %center of robot with respect to center of tag
     offY = 0;
     k = 1;  %k for PID (no need for pid so very large)
-    L = 6.75;  %dist of wheel base
+    L = 6.75;  %dist of wheel base 4.5
     R = 1.5;  %radius of wheel
     
     distX = (goalX - currX) * k;
@@ -34,8 +34,8 @@ function [MP1, MP2] = makeMove (baseX, baseY, currX, currY, currTh, goalX, goalY
         MP1 = 0;
         MP2 = 0;
     else  
-        MP1 = round(MP1 / max(abs(MP1), abs(MP2)) * -10);
-        MP2 = round(MP2 / max(abs(MP1), abs(MP2)) * -10);
+        MP1 = round(MP1 / max(abs(MP1), abs(MP2)) * -20);
+        MP2 = round(MP2 / max(abs(MP1), abs(MP2)) * -20);
     end
  
     display([MP1, MP2]);
