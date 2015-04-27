@@ -3,6 +3,7 @@
 
 COM_CloseNXT all
 hNXT = COM_OpenNXT('bluetooth.ini');
+%hNXT = h;
 COM_SetDefaultNXT(hNXT)
 
 myId = 7;
@@ -12,6 +13,7 @@ HPS = HowiePositioningSystem;
 
 ids = HPS.getVisibleIds();
 % ids => [1; 40] (for example)
+OpenSwitch(SENSOR_1);
 
 % Your main loop
 while true
@@ -35,7 +37,26 @@ while true
     disp('My position');
     disp(myPosition);
     
-    base = 
+    base = corners(1, 1);
+    baseX = base.x;
+    baseY = base.y;
+    
+    %just move towards the enemy
+    [P1, P2] = makeMove(baseX, baseY, myX, myY, myTh, enemyX, enemyY);
+    
+    timeStep = 360;
+    
+    motor1 = NXTMotor('B', 'Power', P1);
+    motor2 = NXTMotor('B', 'Power', P2);
+    
+    motor1.SendToNXT();
+    motor2.SendToNXT();
+    
+    if GetSwitch(SENSOR_1)
+        NXT_PlayTone(800, 1000);
+        motor1.Stop('brake');
+        motor2.Stop('brake');
+    end
     
 end
     

@@ -37,9 +37,9 @@ function [MP1, MP2] = makeMove (baseX, baseY, currX, currY, currTh, goalX, goalY
     MP1 = 90/pi * (2*v - L*w) / R;
     MP2 = 90/pi * (2*v + L*w) / R;
     
-    MP1 = round(MP1 / max(abs(MP1), abs(MP2)) * 10);
-    MP2 = round(MP2 / max(abs(MP1), abs(MP2)) * 10);
+    MP1 = MP1 / max(abs(MP1), abs(MP2));
+    MP2 = MP2 / max(abs(MP1), abs(MP2));
  
-    display([MP1, MP2]);
+    display
     
 end

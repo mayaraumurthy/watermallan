@@ -3,6 +3,7 @@
 
 COM_CloseNXT all
 hNXT = COM_OpenNXT('bluetooth.ini');
+%hNXT = h;
 COM_SetDefaultNXT(hNXT)
 
 myId = 7;
@@ -45,8 +46,13 @@ while true
     
     timeStep = 360;
     
+<<<<<<< HEAD
     motor1 = NXTMotor('A', 'Power', P1, 'TachoLimit', 180);
     motor2 = NXTMotor('B', 'Power', P2, 'TachoLimit', 180);
+=======
+    motor2 = NXTMotor('A', 'Power', P1);
+    motor1 = NXTMotor('B', 'Power', P2);
+>>>>>>> 83614474680490a26f7656aa8459fe4219486425
     
     motor1.SendToNXT();
     motor1.WaitFor();

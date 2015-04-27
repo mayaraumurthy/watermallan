@@ -2,12 +2,18 @@
 %h = COM_OpenNXT('bluetooth.ini');
 COM_SetDefaultNXT(h)
 
-myId = 9; % CHANGE ME: We will tell you what your tag's id is
-enemyID = 1;
+offset = .08; %forward
+
+myId = 7; % CHANGE ME: We will tell you what your tag's id is
+enemyID = 17;
 
 HPS = HowiePositioningSystem;
 
 ids = HPS.getVisibleIds();
+
+enX_Prev =0;
+enY_Prev = 0;
+enTh_Prev = 0;
 
 while true
     myPosition = HPS.getPosition(myId);
@@ -17,11 +23,22 @@ while true
     enY = enPosition.y;
     enTh = enPosition.th; 
     
-    myX = myPosition.x;  %% + offset relating to theta
-    myY = myPosition.y; %% + offset relating to theta
-    myTh = myPosition.th;
     
-    % Here we'll just print the position out
-    disp('My position');
-    disp(myPosition);
+    myTh = myPosition.th;
+    myX = myPosition.x + .08*cos(myTh);  %% + offset relating to theta
+    myY = myPosition.y + .08*sin(myTh); %% + offset relating to theta
+    corners = getCorner(HPS);
+    
+    up = 100*((corners(1,2).y-myY))/(corners(1,2).y - corners(1,1).y);
+    down = 100;
+    left = 100;
+    right = 100;
+    
+    ej
+    x_diff = (enX - myX);
+    y_diff = (enY - myY); 
+    
+    
+    corners = getCorner(HPS);
+    
 end
