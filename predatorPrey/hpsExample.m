@@ -1,7 +1,7 @@
 % Example HowiePositioningSystem Usage
 % Example team's tag id is 1, their opponent's tag id is 40
 
-myId = 1; % CHANGE ME: We will tell you what your tag's id is
+myId = 9; % CHANGE ME: We will tell you what your tag's id is
 
 HPS = HowiePositioningSystem;
 
