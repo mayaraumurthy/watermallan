@@ -45,11 +45,13 @@ while true
     
     timeStep = 360;
     
-    motor1 = NXTMotor('A', 'Power', P1);
-    motor2 = NXTMotor('B', 'Power', P2);
+    motor1 = NXTMotor('A', 'Power', P1, 'TachoLimit', 180);
+    motor2 = NXTMotor('B', 'Power', P2, 'TachoLimit', 180);
     
     motor1.SendToNXT();
+    motor1.WaitFor();
     motor2.SendToNXT();
+    motor2.WaitFor();
     
     if GetSwitch(SENSOR_1)
         NXT_PlayTone(800, 1000);
