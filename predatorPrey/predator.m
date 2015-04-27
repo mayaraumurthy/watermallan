@@ -1,8 +1,9 @@
 % Example HowiePositioningSystem Usage
 % Example team's tag id is 1, their opponent's tag id is 40
 
-COM_CloseNXT all
-hNXT = COM_OpenNXT('bluetooth.ini');
+
+%COM_CloseNXT all
+%hNXT = COM_OpenNXT('bluetooth.ini');
 %hNXT = h;
 COM_SetDefaultNXT(hNXT)
 
@@ -14,7 +15,7 @@ HPS = HowiePositioningSystem;
 ids = HPS.getVisibleIds();
 % ids => [1; 40] (for example)
 OpenSwitch(SENSOR_1);
-
+corners = getCorner(HPS);
 % Your main loop
 while true
     myPosition = HPS.getPosition(myId);
@@ -23,15 +24,13 @@ while true
     % Do something with myPosition
     % You can access the x, y, and theta values like this:
     
-    myX = myPosition.x;
-    myY = myPosition.y;
     myTh = myPosition.th;
+    myX = myPosition.x + .08*cos(myTh);  %% + offset relating to theta
+    myY = myPosition.y + .08*sin(myTh); %% + offset relating to theta
     
     enemyX = enemyPosition.x;
     enemyY = enemyPosition.y;
     enemyTh = enemyPosition.th;   
-    
-    corners = getCorner(HPS);
     
     % Here we'll just print the position out
     disp('My position');
@@ -47,20 +46,20 @@ while true
     timeStep = 360;
     
 
-    motor1 = NXTMotor('A', 'Power', P1, 'TachoLimit', 180);
-    motor2 = NXTMotor('B', 'Power', P2, 'TachoLimit', 180);
-    motor2 = NXTMotor('A', 'Power', P1);
-    motor1 = NXTMotor('B', 'Power', P2);
+    motor1 = NXTMotor('A', 'Power', P1);
+    motor2 = NXTMotor('B', 'Power', P2);
+    motor3 = NXTMotor('C', 'Power', 0);
     
+    motor3.Stop('Brake');
+
     motor1.SendToNXT();
-    motor1.WaitFor();
     motor2.SendToNXT();
-    motor2.WaitFor();
     
     if GetSwitch(SENSOR_1)
         NXT_PlayTone(800, 1000);
         motor1.Stop('brake');
         motor2.Stop('brake');
+        break;
     end
     
 end

@@ -18,12 +18,6 @@ function [MP1, MP2] = makeMove (baseX, baseY, currX, currY, currTh, goalX, goalY
     L = 6.75;  %dist of wheel base
     R = 1.5;  %radius of wheel
     
-    currX = cos(currTh) * offX + currX;
-    currY = sin(currTh) * offX + currY;
-    
-    currX = -sin(currTh) * offY + currX;
-    currY = cos(currTh) * offY + currY;
-    
     distX = (goalX - currX) * k;
     distY = (goalY - currY) * k;
     
@@ -36,9 +30,13 @@ function [MP1, MP2] = makeMove (baseX, baseY, currX, currY, currTh, goalX, goalY
     
     MP1 = 90/pi * (2*v - L*w) / R;
     MP2 = 90/pi * (2*v + L*w) / R;
-    
-    MP1 = round(MP1 / max(abs(MP1), abs(MP2)) * 10);
-    MP2 = round(MP2 / max(abs(MP1), abs(MP2)) * 10);
+    if ((MP1 == 0) && (MP2 == 0))
+        MP1 = 0;
+        MP2 = 0;
+    else  
+        MP1 = round(MP1 / max(abs(MP1), abs(MP2)) * -10);
+        MP2 = round(MP2 / max(abs(MP1), abs(MP2)) * -10);
+    end
  
     display([MP1, MP2]);
     
