@@ -19,26 +19,23 @@ enemyId = 17;
 HPS = HowiePositioningSystem;
 
 ids = HPS.getVisibleIds();
-OpenSwitch(SENSOR_1);
 % ids => [1; 40] (for example)
 
 enX_Prev =0;
 enY_Prev = 0;
 enTh_Prev = 0;
  corners = getCorner(HPS);
-   enemyPosition = HPS.getPosition(enemyId);
-   historysz= 10;
+historysz= 10;
 history=zeros(2,historysz);
 largeTime=5;
-smallTime=.5;
+smallTime=1;
+dT=smallTime;
 stdThreshold=.05;
 enemyDistThreshold=.35;
 counter=0;
 while true
     myPosition = HPS.getPosition(myId);
-    if(ismember(enemyID, 17))
-        enemyPosition = HPS.getPosition(enemyId);
-    end
+    enemyPosition = HPS.getPosition(enemyId);
     
     % Do something with myPosition
     % You can access the x, y, and theta values like this:
@@ -51,7 +48,6 @@ while true
     enemyX = enemyPosition.x;
     enemyY = enemyPosition.y;
     
-    
     %update our history of coordinates
     history(:,(mod(counter,historysz)+1))=[myX;myY];
     
@@ -60,7 +56,7 @@ while true
     %switch dT back to small after this
    
     currDist=sqrt((myX-enemyX)^2+(myY-enemyY)^2);
-    historyStd= (sqrt((var(history(1,:)))^2+(var(history(2,:)))^2));
+    historyStd= sqrt(sqrt((var(history(1,:)))^2+(var(history(2,:)))^2));
     
     if (currDist<enemyDistThreshold) && (historyStd<stdThreshold)
         dT=largeTime;
@@ -69,7 +65,9 @@ while true
     end
     
     
-    pos = nextPos(myX,myY,enemyPosition.x,enemyPosition.y, 20,dT,24, 0.5, corners(1,1).x,corners(2,2).x,corners(1,1).y,corners(2,2).y);
+    
+    
+    pos = nextPos(myX,myY,enemyPosition.x,enemyPosition.y,0.2,dT,8,0.12, corners(1,1).x,corners(2,2).x,corners(1,1).y,corners(2,2).y);
     
     [P1, P2] = makeMove(corners(1,1).x, corners(1,1).y, myX,myY,myTh, pos(1), pos(2));
     
@@ -81,15 +79,6 @@ while true
 
     motor1.SendToNXT();
     motor2.SendToNXT();
-    
-    pause(dT)
-    
-    if GetSwitch(SENSOR_1)
-        NXT_PlayTone(800, 1000);
-        motor1.Stop('brake');
-        motor2.Stop('brake');
-        break;
-    end
     
     
 end
@@ -119,8 +108,7 @@ function bestPos =bestNextPos(validPos,predX,predY)
 
 end
 
-function validPos =filterNotValidPos(possiblePos,xL,xH,yL,yH,m,should_recurse)
-   
+function validPos =filterNotValidPos(possiblePos,xL,xH,yL,yH,m)
     validPos=[];
     for i=1:length(possiblePos)
         preyX=possiblePos(1,i);
@@ -132,28 +120,18 @@ function validPos =filterNotValidPos(possiblePos,xL,xH,yL,yH,m,should_recurse)
         
     end
     if (isempty(validPos))
-        if(should_recurse)
-            disp('BECAME EMPTY')
-            validPos =filterNotValidPos(possiblePos,xL,xH,yL,yH,0*m, false);
-        else
-            NXT_PlayTone(800, 1000);
-            NXT_PlayTone(800, 1000);
-        end
-        
+        validPos=[-100; -100];
     end
-    
 end
 
 function possiblePos =getNextPositions(preyX,preyY,spd,dT, numPos)
     angles=(0:(numPos-1))/numPos*(2*pi) ;
-    possiblePos=[preyX+spd*dT*cos(angles);preyY+spd*dT*sin(angles)]; 
-    %possiblePos=horzcat(possiblePos,[preyX;preyY]);
+    possiblePos=[preyX+spd*dT*cos(angles);preyY+spd*dT*sin(angles)];    
 end
 
-function pos= nextPos(preyX,preyY,predX,predY,mp,dT,numPos,m,xL,xH,yL,yH)
-    spd = 1.5/(5*12)*mp/100*125/60;
+function pos= nextPos(preyX,preyY,predX,predY,spd,dT,numPos,m,xL,xH,yL,yH)
     possiblePos=getNextPositions(preyX,preyY,spd,dT,numPos);
-    validPos=filterNotValidPos(possiblePos,xL,xH,yL,yH,m, true);
+    validPos=filterNotValidPos(possiblePos,xL,xH,yL,yH,m);
     display(validPos);
     if ((validPos(1,1) == -100) && (validPos(2,1) == -100))
         pos = [preyX; preyY];

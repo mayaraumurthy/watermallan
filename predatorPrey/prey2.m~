@@ -1,9 +1,6 @@
 function output =prey2(input)
 
 
-%COM_CloseNXT all
-%h = COM_OpenNXT('bluetooth.ini');
-%COM_SetDefaultNXT(h)
 
 offset = .08; %forward
 
@@ -27,7 +24,12 @@ ids = HPS.getVisibleIds();
 enX_Prev =0;
 enY_Prev = 0;
 enTh_Prev = 0;
-
+ corners = getCorner(HPS);
+historysz= 10;
+history=zeros(2,historysz);
+largeTime=5;
+smallTime=1;
+counter=1;
 while true
     myPosition = HPS.getPosition(myId);
     enemyPosition = HPS.getPosition(enemyId);
@@ -35,15 +37,38 @@ while true
     % Do something with myPosition
     % You can access the x, y, and theta values like this:
     
-    myX = myPosition.x;
-    myY = myPosition.y;
+   % myX = myPosition.x;
+   % myY = myPosition.y;
     myTh = myPosition.th;
     myX = myPosition.x + .08*cos(myTh);  %% + offset relating to theta
     myY = myPosition.y + .08*sin(myTh); %% + offset relating to theta
-    corners = getCorner(HPS);
+    enemyX = enemyPosition.x;
+    enemyY = enemyPosition.y;
+    
+    %update our history of coordinates
+    history(:,mod(counter,)
+    
+    %when enemy is close to us, observe standard deviation of history
+    %if std is below threshold, then make dT large
+    %switch dT back to small after this
+   
+    currDist=sqrt((myX-enemyX)^2+(myY-enemyY)^2);
     
     
-    nextPos(myX,myY,enemyPosition.x,e,spd,dT,numPos,m,xL,xH,yL,yH)
+    
+    
+    pos = nextPos(myX,myY,enemyPosition.x,enemyPosition.y,0.2,1,8,0.12, corners(1,1).x,corners(2,2).x,corners(1,1).y,corners(2,2).y);
+    
+    [P1, P2] = makeMove(corners(1,1).x, corners(1,1).y, myX,myY,myTh, pos(1), pos(2));
+    
+    motor1 = NXTMotor('A', 'Power', P1);
+    motor2 = NXTMotor('B', 'Power', P2);
+    motor3 = NXTMotor('C', 'Power', 0);
+    
+    motor3.Stop('Brake');
+
+    motor1.SendToNXT();
+    motor2.SendToNXT();
     
     
 end
@@ -66,7 +91,7 @@ end
 
 
 function bestPos =bestNextPos(validPos,predX,predY)
-    distances=(validPos(1,:)-predX)^2+(validPos(2,:)-predY)^2;
+    distances=(validPos(1,:)-predX).^2+(validPos(2,:)-predY).^2;
     [~,maxIdx]=max(distances);
     
     bestPos=[validPos(1,maxIdx);validPos(2,maxIdx)];
@@ -79,9 +104,13 @@ function validPos =filterNotValidPos(possiblePos,xL,xH,yL,yH,m)
         preyX=possiblePos(1,i);
         preyY=possiblePos(2,i);
         
-        if ((abs(preyX-xL)<m)&&(abs(preyX-xH)<m)&&(abs(preyY-yL)<m) &&(abs(preyY-yH)<m))
-            validPos=horzcat(validPos,[preyX,preyY]);
+        if (~((preyX<(xL+m))||(preyY<(yL+m))||(preyX>(xH-m))||(preyY>(yH-m))))
+            validPos=horzcat(validPos,[preyX ;preyY]);
         end
+        
+    end
+    if (isempty(validPos))
+        validPos=[-100; -100];
     end
 end
 
@@ -93,5 +122,10 @@ end
 function pos= nextPos(preyX,preyY,predX,predY,spd,dT,numPos,m,xL,xH,yL,yH)
     possiblePos=getNextPositions(preyX,preyY,spd,dT,numPos);
     validPos=filterNotValidPos(possiblePos,xL,xH,yL,yH,m);
-    pos=bestNextPos(validPos,predX,predY);
+    display(validPos);
+    if ((validPos(1,1) == -100) && (validPos(2,1) == -100))
+        pos = [preyX; preyY];
+    else  
+        pos=bestNextPos(validPos,predX,predY);
+    end
 end
