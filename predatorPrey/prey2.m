@@ -30,6 +30,8 @@ smallTime=15;
 stdThreshold=.2;
 enemyDistThreshold=.45;
 counter=0;
+timeCount = 0;
+timeLimitForLocalMin = 5;
 while true
     enemyPosition = HPS.getPosition(enemyId);
     myPosition = HPS.getPosition(myId);
@@ -57,14 +59,16 @@ while true
     historyStd= (sqrt((var(history(1,:)))^2+(var(history(2,:)))^2));
     
     %display([currDist, historyStd]);
-    if (currDist<enemyDistThreshold) && (historyStd<stdThreshold)
+    if (currDist<enemyDistThreshold) && (historyStd<stdThreshold) && (timeCount == 0)
         dT=largeTime;
         disp('IN LOCAL MINEMA!!');
-        buffer=5;
-        
+        timeCount = timeCount + 1;
     else
-        dT=smallTime;
-        buffer=.5;
+        if (timeCount > 0)
+              dT=largeTime;
+        else
+              dT=smallTime;
+        end
     end
     
     
@@ -81,7 +85,7 @@ while true
     motor1.SendToNXT();
     motor2.SendToNXT();
     
-    pause(buffer);
+    pause(0.5);
     
     if GetSwitch(SENSOR_1)
         NXT_PlayTone(800, 1000);
@@ -90,6 +94,9 @@ while true
         break;
     end
     
+    if (timeCount == timeLimitForLocalMin)
+        timeCount = 0;
+    end
     
 end
 end
