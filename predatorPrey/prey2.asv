@@ -3,6 +3,9 @@ function output =prey2(input)
 
 
 offset = .08; %forward
+
+myId = 7; % CHANGE ME: We will tell you what your tag's id is
+enemyID = 7;
 % Example HowiePositioningSystem Usage
 % Example team's tag id is 1, their opponent's tag id is 40
 
@@ -11,7 +14,7 @@ hNXT = COM_OpenNXT('bluetooth.ini');
 COM_SetDefaultNXT(hNXT)
 
 myId = 7;
-enemyId = 31;
+enemyId = 17;
 
 HPS = HowiePositioningSystem;
 
@@ -22,17 +25,20 @@ OpenSwitch(SENSOR_1);
 enX_Prev =0;
 enY_Prev = 0;
 enTh_Prev = 0;
-corners = getCorner(HPS);
-historysz= 10;
+ corners = getCorner(HPS);
+   enemyPosition = HPS.getPosition(enemyId);
+   historysz= 10;
 history=zeros(2,historysz);
-largeTime=50;
+largeTime=30;
 smallTime=15;
-stdThreshold=.2;
-enemyDistThreshold=.45;
+stdThreshold=.05;
+enemyDistThreshold=.35;
 counter=0;
 while true
-    enemyPosition = HPS.getPosition(enemyId);
     myPosition = HPS.getPosition(myId);
+    if(ismember(enemyID, 17))
+        enemyPosition = HPS.getPosition(enemyId);
+    end
     
     % Do something with myPosition
     % You can access the x, y, and theta values like this:
@@ -56,19 +62,15 @@ while true
     currDist=sqrt((myX-enemyX)^2+(myY-enemyY)^2);
     historyStd= (sqrt((var(history(1,:)))^2+(var(history(2,:)))^2));
     
-    %display([currDist, historyStd]);
     if (currDist<enemyDistThreshold) && (historyStd<stdThreshold)
         dT=largeTime;
-        disp('IN LOCAL MINEMA!!');
-        buffer=5;
-        
+        disp('IN LOCAL MINE')
     else
         dT=smallTime;
-        buffer=.5;
     end
     
     
-    pos = nextPos(myX,myY,enemyPosition.x,enemyPosition.y, 20,dT,24, 0.1, corners(1,1).x,corners(2,2).x,corners(1,1).y,corners(2,2).y);
+    pos = nextPos(myX,myY,enemyPosition.x,enemyPosition.y, 20,dT,24, 0.5, corners(1,1).x,corners(2,2).x,corners(1,1).y,corners(2,2).y);
     
     [P1, P2] = makeMove(corners(1,1).x, corners(1,1).y, myX,myY,myTh, pos(1), pos(2));
     
@@ -81,7 +83,7 @@ while true
     motor1.SendToNXT();
     motor2.SendToNXT();
     
-    pause(buffer);
+    pause(0.5);
     
     if GetSwitch(SENSOR_1)
         NXT_PlayTone(800, 1000);
@@ -132,7 +134,7 @@ function validPos =filterNotValidPos(possiblePos,xL,xH,yL,yH,m,should_recurse)
     end
     if (isempty(validPos))
         if(should_recurse)
-            disp('BECAME EMPTY');
+            disp('BECAME EMPTY')
             validPos =filterNotValidPos(possiblePos,xL,xH,yL,yH,0*m, false);
         else
             NXT_PlayTone(800, 1000);

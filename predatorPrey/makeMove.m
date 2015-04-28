@@ -37,7 +37,5 @@ function [MP1, MP2] = makeMove (baseX, baseY, currX, currY, currTh, goalX, goalY
         MP1 = round(MP1 / max(abs(MP1), abs(MP2)) * -20);
         MP2 = round(MP2 / max(abs(MP1), abs(MP2)) * -20);
     end
- 
-    display([MP1, MP2]);
-    
+     
 end
