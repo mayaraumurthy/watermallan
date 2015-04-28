@@ -74,17 +74,31 @@ function output = turnToEdge(myTh, edge)
 end
     
     
-function edge  = chooseEdge(myX, myY, myTh, enX, enY, xL, xH, yL, yH)
-    dists = [abs(xH - enX), abs(yH - enY), abs(xL - enX), abs(yL - enY)];
-    [~, minEnemy] = min(dists);
-    possibilities = [xH, yH, xL, yL];
-    if (mod(minEnemy,2) == 1)
-        possibilities(minEnemy) = myX;
-    else
-        possibilities(minEnemy) = myY;
+function edge  = chooseEdge(myX, myY, enX, enY, xL, xH, yL, yH)
+    rectX = [xL, xL, xH, xH, xL];
+    rectY = [yL, yH, yH, yL, yL];
+    newX = enX + (myX - enX) * 10;
+    newY = enY + (myY - enY) * 10;
+    [x, y] = polyxpoly([enX, newX], [enY, newY], rectX, rectY);
+    if ((size(x) ~= 1) || (y ~= 1))
+        error('there should only be one point intersecting with the boundary!');
     end
-    dists = abs(possibilities - [myX, myY, myX, myY]);
-    [~, edge] = max(dists);
+    edge = 4;
+    if (x == xL)
+        edge = 2;
+    end
+    if (x == xH)
+        edge = 0;
+    end
+    if (y == yL)
+        edge = 3;
+    end
+    if (y =- yH)
+        edge = 1;
+    end
+    if (edge == 4)
+        error('not finding an edge!');
+    end
 end
 
 function powers = move_to_edge(edge, myX, myY, corners)

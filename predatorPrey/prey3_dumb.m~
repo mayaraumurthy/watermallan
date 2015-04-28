@@ -35,7 +35,7 @@ corners = getCorner(HPS);
     myTh = myPosition.th;
     myX = myPosition.x + .08*cos(myTh);  %% + offset relating to theta
     myY = myPosition.y + .08*sin(myTh); %% + offset relating to theta
-    turnToEdge(myTh, 0);
+    turnToEdge(myTh, 3);
     %disp(myTh / (2*pi) * 360);
         
         
@@ -43,26 +43,79 @@ corners = getCorner(HPS);
 end
 
 function output = turnToEdge(myTh, edge)
-    disp(myTh / (2*pi) * 360);
     ratio = 60;
     L = 6.75;  %dist of wheel base
     R = 1.5;  %radius of wheel
-
+    if(myTh < 0)
+        myTh = (pi * 2) + myTh;
+    end
+    disp(myTh / (2*pi) * 360);
     desiredTh = edge * (pi/2);
+    if(desiredTh ==0 && myTh > pi)
+        desiredTh = pi * 2;
+    end
     disp(desiredTh/ (2*pi) * 360);
     circ = pi * L;
     dist = (abs(myTh - desiredTh) / (2 * pi)) * circ;
     one_dist = dist;
     rot = (one_dist / (pi * 2 * R)) * (360);
     disp(rot);
-    motor1 = NXTMotor('A', 'Power', 100, 'TachoLimit', floor(rot));
-    motor2 = NXTMotor('B', 'Power', -100, 'TachoLimit',  floor(rot));
+    if(myTh > desiredTh)
+        motor1 = NXTMotor('A', 'Power', -50, 'TachoLimit', floor(rot));
+        motor2 = NXTMotor('B', 'Power', 50, 'TachoLimit',  floor(rot));
+    else
+        motor1 = NXTMotor('A', 'Power', 50, 'TachoLimit', floor(rot));
+        motor2 = NXTMotor('B', 'Power', -50, 'TachoLimit',  floor(rot));
+    end
     motor1.SendToNXT();
     motor2.SendToNXT();
     motor1.WaitFor();
     motor2.WaitFor();
 end
+    
+    
+function edge  = chooseEdge(myX, myY, myTh, enX, enY, xL, xH, yL, yH)
+    rectX = [xL, xL, xH, xH, xL];
+    rectY = [yL, yH, yH, yL, yL];
+    newX = enX + (myX - enX) * 10;
+    newY = enY + (myY - enY) * 10;
+    [x, y] = polyxpoly([enX, newX], [enY, newY], rectX, rectY);
+    if ((size(x) ~= 1) || (y ~= 1))
+        error('there should only be one point intersecting with the boundary!');
+    end
+    if (
+end
 
+function powers = move_to_edge(edge, myX, myY, corners)
+    ratio = 60;
+    diff = 0;
+    if(edge == 0)
+        diff = corners(2,2).x - myX;
+    elseif(edge == 1)
+        diff = corners(2,2).y - myY;
+    elseif(edge == 2)
+        diff = myX - corners(1,1).x;
+    elseif(edge == 3)
+        diff = myY - corners(1,1).y;
+    end
+    dist = (diff - .1) * ratio ;
+    rot = (dist / (pi * 2 * R)) * (360);
+    motor1 = NXTMotor('A', 'Power', 50, 'TachoLimit', floor(rot));
+    motor2 = NXTMotor('B', 'Power', 50, 'TachoLimit',  floor(rot));
+    motor1.SendToNXT();
+    motor2.SendToNXT();
+    motor1.WaitFor();
+    motor2.WaitFor();
+end
+    
+
+function output = goToEdge(myX, myY, myTh, enX, enyY, corners)
+    edge = chooseEdge(myX, myY, myTh, enX, enY, corners(1, 1).x,  corners(2, 2).x, corners(1, 1).y, corners(1,1).x);
+    turnToEdge(myTh, edge)
+    myPosition = HPS.getPosition(myId);
+    turnToEdge(myPosition.th, edge);
+    
+end
 
 function b = at_edge(myX, myY, curr_dest, corners)
    b = false;
@@ -131,7 +184,6 @@ function new_edge = choose_edge_from_corner(myX, myY, corners, enX, enY)
             new_edge = 0;
         end
    end
-        
 end
 
 
@@ -189,24 +241,4 @@ function new_edge = should_change_edge(myX, myY, enX, enY, curr_dest, corners)
             end
         end
    end
-end
-
-
-
-function output = goToEdge(~, myY, myTh, enemyPos, corners)
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
 end
