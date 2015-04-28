@@ -5,14 +5,11 @@ function output=prey3_dumb(input)
 %COM_SetDefaultNXT(h)
 
 offset = .08; %forward
-
-myId = 7; % CHANGE ME: We will tell you what your tag's id is
-enemyID = 7;
 % Example HowiePositioningSystem Usage
 % Example team's tag id is 1, their opponent's tag id is 40
 
 myId = 7;
-enemyId = 7;
+enemyId = 31;
 
 HPS = HowiePositioningSystem;
 
@@ -23,7 +20,10 @@ enX_Prev =0;
 enY_Prev = 0;
 enTh_Prev = 0;
 corners = getCorner(HPS);
-%while true
+
+start = true;
+edge = 0;
+while true
     myPosition = HPS.getPosition(myId);
     enemyPosition = HPS.getPosition(enemyId);
     
@@ -35,11 +35,27 @@ corners = getCorner(HPS);
     myTh = myPosition.th;
     myX = myPosition.x + .08*cos(myTh);  %% + offset relating to theta
     myY = myPosition.y + .08*sin(myTh); %% + offset relating to theta
-    turnToEdge(myTh, 3);
-    %disp(myTh / (2*pi) * 360);
+    
+    if(start)
+        edge = goToEdge(myX, myY, myTh, enemyPosition.x, enemyPosition.y, corners, HPS, myId)
+        start = false;
+    else
+        rot = move_to_edge(edge, myX, myY, corners)
+        motor1 = NXTMotor('A', 'Power', -100, 'TachoLimit', floor(rot));
+        motor2 = NXTMotor('B', 'Power', -100, 'TachoLimit',  floor(rot));
+        motor1.SendToNXT();
+        motor2.SendToNXT();
+        motor1.WaitFor();
+        motor2.WaitFor();
+        
+       
         
         
-%end
+    end
+        
+    
+        
+end
 end
 
 function output = turnToEdge(myTh, edge)
@@ -61,11 +77,11 @@ function output = turnToEdge(myTh, edge)
     rot = (one_dist / (pi * 2 * R)) * (360);
     disp(rot);
     if(myTh > desiredTh)
-        motor1 = NXTMotor('A', 'Power', -50, 'TachoLimit', floor(rot));
-        motor2 = NXTMotor('B', 'Power', 50, 'TachoLimit',  floor(rot));
+        motor1 = NXTMotor('A', 'Power', -100, 'TachoLimit', floor(rot));
+        motor2 = NXTMotor('B', 'Power', 100, 'TachoLimit',  floor(rot));
     else
-        motor1 = NXTMotor('A', 'Power', 50, 'TachoLimit', floor(rot));
-        motor2 = NXTMotor('B', 'Power', -50, 'TachoLimit',  floor(rot));
+        motor1 = NXTMotor('A', 'Power', 100, 'TachoLimit', floor(rot));
+        motor2 = NXTMotor('B', 'Power', -100, 'TachoLimit',  floor(rot));
     end
     motor1.SendToNXT();
     motor2.SendToNXT();
@@ -87,43 +103,163 @@ function edge  = chooseEdge(myX, myY, myTh, enX, enY, xL, xH, yL, yH)
     [~, edge] = max(dists);
 end
 
-function powers = move_to_edge(edge, myX, myY, corners)
+function rot = move_to_edge(edge, myX, myY, corners)
     ratio = 60;
+    L = 6.75;  %dist of wheel base
+    R = 1.5;  %radius of wheel
     diff = 0;
     if(edge == 0)
-        diff = corners(2,2).x - myX
+        diff = corners(2,2).x - myX;
     elseif(edge == 1)
-        diff = corners(2,2).y - myY
+        diff = corners(2,2).y - myY;
     elseif(edge == 2)
-        diff = myX - corners(1,1).x
+        diff = myX - corners(1,1).x;
     elseif(edge == 3)
-        diff = myY - corners(1,1).y
+        diff = myY - corners(1,1).y;
     end
-    dist = diff * ratio
-        
-        
+    dist = max(0, (diff - .125)) * ratio ;
+    rot = (dist / (pi * 2 * R)) * (360);
 end
-    
 
-function output = goToEdge(myX, myY, myTh, enX, enyY, corners)
+function b = at_edge(myX, myY, curr_dest, corners)
+   b = false;
+   threshold = 0.1
+   if(curr_dest == 0)
+       if(myX > corners(2,2).x - threshold) && (myY < corners(1,1).y + threshold || myY > corners(2,2).y - threshold)
+           b = true;
+       end
+   end
+   
+   if(curr_dest == 1)
+       if(myY > corners(2,2).y - threshold) && (myX < corners(1,1).x + threshold || myX > corners(1,1).x - threshold)
+           b = true;
+       end
+   end
+   
+   if(curr_dest == 2)
+       if(myX < corners(1,1).x + threshold) && (myY < corners(1,1).y + threshold || myY > corners(2,2).y - threshold)
+           b = true;
+       end
+   end
+   
+   if(curr_dest == 3)
+       if(myY < corners(1,1).y + threshold) && (myX < corners(1,1).x + threshold || myX > corners(2,2).x - threshold)
+           b = true;
+       end
+   end
+end
+
+function new_edge = choose_edge_from_corner(myX, myY, corners, enX, enY)
+    midY = corners(2,2).y - corners(1,1).y
+    midX = cornerS(2,2).x - corners(2,2).y
+    new_edge = curr_edge;
+    if((myX < midX && myY < midY))
+        new_edge = 1;
+        disty = enY - corners(1,1).y;
+        distx = eX - corners(1,1).x
+        if(disty > dist)
+            new_edge = 0;
+        end
+    end
+    
+   if((myX > midX && myY < midY))
+        new_edge = 1;
+        disty = enY - corners(1,1).y;
+        distx = corners(2,2).x - enX
+        if(disty > dist)
+            new_edge = 2;
+        end
+   end
+   
+   if((myX > midX && myY > midY))
+        new_edge = 3;
+        disty = corners(2,2).y - enY;
+        distx = corners(2,2).x - enX;
+        if(disty > dist)
+            new_edge = 2;
+        end
+   end
+   
+   if((myX < midX && myY > midY))
+        new_edge = 3;
+        disty = corners(2,2).y - enY;
+        distx = enX - corners(1,1).x;
+        if(disty > dist)
+            new_edge = 0;
+        end
+   end
+end
+
+
+
+function new_edge = should_change_edge(myX, myY, enX, enY, curr_dest, corners)
+    threshold = 0.1;
+
+    new_edge = curr_dest;
+    midx = (corners(2,2).x - corners(1,1).x) / 2;
+    midy = (corners(2,2).y - corners(1,1).y) / 2;
+    if(curr_dest == 0)
+        if(myY < midy)
+            if((enX > myX) && (enY < midY - threshold))
+                new_edge = 2;
+            end
+        else
+            if((enX > myX) && enY(enY > midY + threshold))
+                new_edge = 2;
+            end
+        end
+   end
+    
+   if(curr_dest == 1)
+        if(myX < midX)
+            if((enY > myY) && (enX < midX - threshold))
+                new_edge = 3;
+            end
+        else
+            if((enY > myY) && enY(enX > midX + threshold))
+                new_edge = 3;
+            end
+        end
+    end
+    
+    if(curr_dest == 2)
+        if(myY < midy)
+            if((enX < myX) && (enY < midY - threshold))
+                new_edge = 0;
+            end
+        else
+            if((enX < myX) && enY(enY > midY + threshold))
+                new_edge = 0; 
+            end
+        end
+    end
+    
+   if(curr_dest == 3)
+        if(myX < midX)
+            if((enY < myY) && (enX < midX - threshold))
+                new_edge = 1;
+            end
+        else
+            if((enY < myY) && enY(enX > midX + threshold))
+                new_edge = 1;
+            end
+        end
+   end
+end
+
+function edge = goToEdge(myX, myY, myTh, enX, enY, corners, HPS, myId)
     edge = chooseEdge(myX, myY, myTh, enX, enY, corners(1, 1).x,  corners(2, 2).x, corners(1, 1).y, corners(1,1).x);
+    edge = edge-1;
     turnToEdge(myTh, edge)
     myPosition = HPS.getPosition(myId);
     turnToEdge(myPosition.th, edge);
+    rot = move_to_edge(edge, myX, myY, corners)
+    motor1 = NXTMotor('A', 'Power', -100, 'TachoLimit', floor(rot));
+    motor2 = NXTMotor('B', 'Power', -100, 'TachoLimit',  floor(rot));
+    motor1.SendToNXT();
+    motor2.SendToNXT();
+    motor1.WaitFor();
+    motor2.WaitFor();
     
-    
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
+    edge = turnToEdge(myTh, mod(edge+1, mod4));
 end
