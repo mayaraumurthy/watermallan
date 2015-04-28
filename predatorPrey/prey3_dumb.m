@@ -62,23 +62,136 @@ function output = turnToEdge(myTh, edge)
     motor1.WaitFor();
     motor2.WaitFor();
 end
+
+
+function b = at_edge(myX, myY, curr_dest, corners)
+   b = false;
+   threshold = 0.1
+   if(curr_dest == 0)
+       if(myX > corners(2,2).x - threshold) && (myY < corners(1,1).y + threshold || myY > corners(2,2).y - threshold)
+           b = true;
+       end
+   end
+   
+   if(curr_dest == 1)
+       if(myY > corners(2,2).y - threshold) && (myX < corners(1,1).x + threshold || myX > corners(1,1).x - threshold)
+           b = true;
+       end
+   end
+   
+   if(curr_dest == 2)
+       if(myX < corners(1,1).x + threshold) && (myY < corners(1,1).y + threshold || myY > corners(2,2).y - threshold)
+           b = true;
+       end
+   end
+   
+   if(curr_dest == 3)
+       if(myY < corners(1,1).y + threshold) && (myX < corners(1,1).x + threshold || myX > corners(2,2).x - threshold)
+           b = true;
+       end
+   end
+end
+
+function new_edge = choose_edge_from_corner(myX, myY, corners, enX, enY)
+    midY = corners(2,2).y - corners(1,1).y
+    midX = cornerS(2,2).x - corners(2,2).y
+    new_edge = curr_edge;
+    if((myX < midX && myY < midY))
+        new_edge = 1;
+        disty = enY - corners(1,1).y;
+        distx = eX - corners(1,1).x
+        if(disty > dist)
+            new_edge = 0;
+        end - enY
+    end
     
+   if((myX > midX && myY < midY))
+        new_edge = 1;
+        disty = enY - corners(1,1).y;
+        distx = corners(2,2).x - enX
+        if(disty > dist)
+            new_edge = 2;
+        end
+   end
+   
+   if((myX > midX && myY > midY))
+        new_edge = 3;
+        disty = corners(2,2).y - enY;
+        distx = corners(2,2).x - enX;
+        if(disty > dist)
+            new_edge = 2;
+        end
+   end
+   
+   if((myX < midX && myY > midY))
+        new_edge = 3;
+        disty = corners(2,2).y - enY;
+        distx = enX - corners(1,1).x;
+        if(disty > dist)
+            new_edge = 0;
+        end
+   end
+end
+
+
+
+function new_edge = should_change_edge(myX, myY, enX, enY, curr_dest, corners)
+    threshold = 0.1;
+
+    new_edge = curr_dest;
+    midx = (corners(2,2).x - corners(1,1).x) / 2;
+    midy = (corners(2,2).y - corners(1,1).y) / 2;
+    if(curr_dest == 0)
+        if(myY < midy)
+            if((enX > myX) && (enY < midY - threshold))
+                new_edge = 2;
+            end
+        else
+            if((enX > myX) && enY(enY > midY + threshold))
+                new_edge = 2;
+            end
+        end
+   end
     
+   if(curr_dest == 1)
+        if(myX < midX)
+            if((enY > myY) && (enX < midX - threshold))
+                new_edge = 3;
+            end
+        else
+            if((enY > myY) && enY(enX > midX + threshold))
+                new_edge = 3;
+            end
+        end
+    end
+    
+    if(curr_dest == 2)
+        if(myY < midy)
+            if((enX < myX) && (enY < midY - threshold))
+                new_edge = 0;
+            end
+        else
+            if((enX < myX) && enY(enY > midY + threshold))
+                new_edge = 0; 
+            end
+        end
+    end
+    
+   if(curr_dest == 3)
+        if(myX < midX)
+            if((enY < myY) && (enX < midX - threshold))
+                new_edge = 1;
+            end
+        else
+            if((enY < myY) && enY(enX > midX + threshold))
+                new_edge = 1;
+            end
+        end
+   end
+end
+
+
 
 function output = goToEdge(~, myY, myTh, enemyPos, corners)
-    
-
-
-    
-
-
-
-
-
-
-
-
-
-
 
 end
