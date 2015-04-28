@@ -1,4 +1,4 @@
-function [MP1, MP2] = makeMove (baseX, baseY, currX, currY, currTh, goalX, goalY)
+function [MP1, MP2] = makeMove (baseX, baseY, currX, currY, currTh, goalX, goalY, speed)
     
     %base: the coordinates of corner (0,0).
     %curr: the coordinates of the robot (angle required).
@@ -26,7 +26,7 @@ function [MP1, MP2] = makeMove (baseX, baseY, currX, currY, currTh, goalX, goalY
          -sin(currTh) / offX, cos(currTh) / offX];
     velocity = M * [distX; distY];
     v = velocity(1);
-    w = velocity(2);
+    w = velocity(2) / 6;
     
     MP1 = 90/pi * (2*v - L*w) / R;
     MP2 = 90/pi * (2*v + L*w) / R;
@@ -34,8 +34,8 @@ function [MP1, MP2] = makeMove (baseX, baseY, currX, currY, currTh, goalX, goalY
         MP1 = 0;
         MP2 = 0;
     else  
-        MP1 = round(MP1 / max(abs(MP1), abs(MP2)) * -20);
-        MP2 = round(MP2 / max(abs(MP1), abs(MP2)) * -20);
+        MP1 = round(MP1 / max(abs(MP1), abs(MP2)) * speed);
+        MP2 = round(MP2 / max(abs(MP1), abs(MP2)) * speed);
     end
      
 end

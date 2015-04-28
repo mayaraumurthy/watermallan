@@ -47,8 +47,10 @@ while true
         motor2 = NXTMotor('B', 'Power', -100, 'TachoLimit',  floor(rot));
         motor1.SendToNXT();
         motor2.SendToNXT();
+        motor1.WaitFor();
+        motor2.WaitFor();
         if(at_edge(myX, myY, edge, corners))
-            edge = choose_edge_from_corner(myX, myY, corners, enX, enY)
+            edge = choose_edge_from_corner(myX, myY, corners, enX, enY);
         end
         
     end
@@ -90,14 +92,16 @@ function ratio = turnToEdge(myTh, edge)
     motor2.WaitFor();
 end
     
-    
+%{    
 function edge  = chooseEdge(myX, myY, enX, enY, xL, xH, yL, yH)
     rectX = [xL, xL, xH, xH, xL];
     rectY = [yL, yH, yH, yL, yL];
-    newX = enX + (myX - enX) * 10;
-    newY = enY + (myY - enY) * 10;
+    newX = enX + (myX - enX) * 100;
+    newY = enY + (myY - enY) * 100;
     [x, y] = polyxpoly([enX, newX], [enY, newY], rectX, rectY);
-    if ((size(x) ~= 1) || (y ~= 1))
+    display([enX, enY, newX, newY]);
+    display([x, y]);
+    if ((length(x) ~= 1) || (length(y) ~= 1))
         error('there should only be one point intersecting with the boundary!');
     end
     edge = 4;
@@ -110,13 +114,28 @@ function edge  = chooseEdge(myX, myY, enX, enY, xL, xH, yL, yH)
     if (y == yL)
         edge = 3;
     end
-    if (y =- yH)
+    if (y == yH)
         edge = 1;
     end
     if (edge == 4)
         error('not finding an edge!');
     end
 end
+%}
+
+function edge  = chooseEdge(myX, myY, enX, enY, xL, xH, yL, yH)
+   edge = 0;
+    if(enX > myX)
+       edge = 2
+    elseif(enX < myX)
+        edge = 0
+    elseif(enY > myY)
+        edge = 3
+    else
+        edge = 1
+    end
+end
+
 
 function rot = move_to_edge(edge, myX, myY, corners)
     ratio = 60;
@@ -263,7 +282,7 @@ function new_edge = should_change_edge(myX, myY, enX, enY, curr_dest, corners)
 end
 
 function edge = goToEdge(myX, myY, myTh, enX, enY, corners, HPS, myId)
-    edge = chooseEdge(myX, myY, myTh, enX, enY, corners(1, 1).x,  corners(2, 2).x, corners(1, 1).y, corners(1,1).x);
+    edge = chooseEdge(myX, myY, enX, enY, corners(1, 1).x,  corners(2, 2).x, corners(1, 1).y, corners(1,1).x);
     edge = edge-1;
     turnToEdge(myTh, edge)
     myPosition = HPS.getPosition(myId);

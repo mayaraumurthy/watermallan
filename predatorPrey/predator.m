@@ -2,11 +2,10 @@
 % Example team's tag id is 1, their opponent's tag id is 40
 
 
-%COM_CloseNXT all
-%hNXT = COM_OpenNXT('bluetooth.ini');
-%hNXT = h;
+COM_CloseNXT all
+hNXT = COM_OpenNXT('bluetooth.ini');
 COM_SetDefaultNXT(hNXT)
-
+disp('connected');
 myId = 7;
 enemyId = 17;
 
@@ -19,7 +18,9 @@ corners = getCorner(HPS);
 % Your main loop
 while true
     myPosition = HPS.getPosition(myId);
-    enemyPosition = HPS.getPosition(enemyId);
+    if(ismember(enemyId, ids))
+        enemyPosition = HPS.getPosition(enemyId);
+    end
     
     % Do something with myPosition
     % You can access the x, y, and theta values like this:
@@ -32,6 +33,8 @@ while true
     enemyY = enemyPosition.y;
     enemyTh = enemyPosition.th;   
     
+    %disp(strcat('enemyx:', int2str(enemyX), ' enemyY:', enemyY, ' enemyTH:', enemyTh));
+    
     % Here we'll just print the position out
     disp('My position');
     disp(myPosition);
@@ -41,7 +44,7 @@ while true
     baseY = base.y;
     
     %just move towards the enemy
-    [P1, P2] = makeMove(baseX, baseY, myX, myY, myTh, enemyX, enemyY);
+    [P1, P2] = makeMove(baseX, baseY, myX, myY, myTh, enemyX, enemyY, -20);
     
     timeStep = 360;
     
@@ -59,8 +62,9 @@ while true
         NXT_PlayTone(800, 1000);
         motor1.Stop('brake');
         motor2.Stop('brake');
-        break;
+        %break;
     end
+    pause(0.15)
     
 end
     

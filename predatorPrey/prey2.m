@@ -11,7 +11,7 @@ hNXT = COM_OpenNXT('bluetooth.ini');
 COM_SetDefaultNXT(hNXT)
 
 myId = 7;
-enemyId = 31;
+enemyId = 3;
 
 HPS = HowiePositioningSystem;
 
@@ -25,9 +25,10 @@ enTh_Prev = 0;
 corners = getCorner(HPS);
 historysz= 10;
 history=zeros(2,historysz);
+history=[1:historysz; 1:historysz];
 largeTime=50;
 smallTime=15;
-stdThreshold=.2;
+stdThreshold=.004;
 enemyDistThreshold=.45;
 counter=0;
 timeCount = 0;
@@ -50,6 +51,7 @@ while true
     
     %update our history of coordinates
     history(:,(mod(counter,historysz)+1))=[myX;myY];
+    counter = counter + 1;
     
     %when enemy is close to us, observe standard deviation of history
     %if std is below threshold, then make dT large
@@ -58,13 +60,14 @@ while true
     currDist=sqrt((myX-enemyX)^2+(myY-enemyY)^2);
     historyStd= (sqrt((var(history(1,:)))^2+(var(history(2,:)))^2));
     
-    %display([currDist, historyStd]);
+    display([currDist, historyStd, timeCount]);
     if (currDist<enemyDistThreshold) && (historyStd<stdThreshold) && (timeCount == 0)
         dT=largeTime;
         disp('IN LOCAL MINEMA!!');
         timeCount = timeCount + 1;
     else
         if (timeCount > 0)
+            timeCount = timeCount + 1;
               dT=largeTime;
         else
               dT=smallTime;
@@ -74,7 +77,7 @@ while true
     
     pos = nextPos(myX,myY,enemyPosition.x,enemyPosition.y, 20,dT,24, 0.1, corners(1,1).x,corners(2,2).x,corners(1,1).y,corners(2,2).y);
     
-    [P1, P2] = makeMove(corners(1,1).x, corners(1,1).y, myX,myY,myTh, pos(1), pos(2));
+    [P1, P2] = makeMove(corners(1,1).x, corners(1,1).y, myX,myY,myTh, pos(1), pos(2), -30);
     
     motor1 = NXTMotor('A', 'Power', P1);
     motor2 = NXTMotor('B', 'Power', P2);
@@ -160,7 +163,8 @@ function pos= nextPos(preyX,preyY,predX,predY,mp,dT,numPos,m,xL,xH,yL,yH)
     spd = 1.5/(5*12)*mp/100*125/60;
     possiblePos=getNextPositions(preyX,preyY,spd,dT,numPos);
     validPos=filterNotValidPos(possiblePos,xL,xH,yL,yH,m, true);
-    display(validPos);
+    %display(validPos);
 
     pos=bestNextPos(validPos,predX,predY);
+    %display(pos);
 end
